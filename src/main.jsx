@@ -11,6 +11,7 @@ import {
   RouterProvider,
 }
   from "react-router";
+import LoginPage from './pages/login.jsx'
 
 
 let router = createBrowserRouter([
@@ -33,6 +34,10 @@ let router = createBrowserRouter([
   {
     path: "register",
     element: <RegisterPage />
+  },
+  {
+    path: "login",
+    element: <LoginPage />
   },
 ]);
 

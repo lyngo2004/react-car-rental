@@ -1,27 +1,31 @@
 //src\pages\register.jsx
 import React from 'react';
 import { Button, Form, Input, notification } from 'antd';
-import { creatUserApi } from '../utils/api';
+import { loginApi } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
 
-const RegisterPage = () => {
+const LoginPage = () => {
 
     const navigate = useNavigate();
 
     const onFinish = async (values) => {
-        const { username, email, password } = values;
-        const res = await creatUserApi(username, email, password);
 
-        if (res?.success) {
+        const { username, password } = values;
+        const res = await loginApi(username, password);
+
+        //debugger;
+
+        if (res?.EC === 0) {
+            localStorage.setItem("accessToken", res.DT.accessToken);
             notification.success({
-                message: "Create User",
-                description: res.message || "User created successfully!",
+                message: "Login",
+                description: "Login successfully!",
             });
-            navigate('/login');
+            navigate('/');
         } else {
             notification.error({
-                message: "Create User",
-                description: res?.message || "Something went wrong!",
+                message: "Login",
+                description: res?.EM ?? "Something went wrong!",
             });
         }
 
@@ -38,13 +42,6 @@ const RegisterPage = () => {
                 autoComplete="off"
                 layout='vertical'
             >
-                <Form.Item
-                    label="Email Address"
-                    name="email"
-                    rules={[{ required: true, message: 'Please input your email!' }]}
-                >
-                    <Input />
-                </Form.Item>
 
                 <Form.Item
                     label="Username"
@@ -64,7 +61,7 @@ const RegisterPage = () => {
 
                 <Form.Item label={null}>
                     <Button type="primary" htmlType="submit">
-                        Register
+                        Login
                     </Button>
                 </Form.Item>
             </Form>
@@ -73,4 +70,4 @@ const RegisterPage = () => {
     )
 }
 
-export default RegisterPage;
+export default LoginPage;

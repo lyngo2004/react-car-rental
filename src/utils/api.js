@@ -14,4 +14,17 @@ const creatUserApi = async (username, email, password) => {
   }
 };
 
-export { creatUserApi }
+const loginApi = async (username, password) => {
+  try {
+    const URL_API = "api/v1/login";
+    const res = await axios.post(URL_API, { username, password });
+    
+    // res.data chính là dữ liệu thật bạn trả về từ Node.js (success, message, data)
+    return res;
+  } catch (error) {
+    console.error("Error in loginApi:", error.response?.data || error.message);
+    return null;
+  }
+};
+
+export { creatUserApi, loginApi };
