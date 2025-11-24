@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import Header from "./components/layout/header";
 import axios from "./utils/axios.customize"
 import { useEffect } from "react"
+import Footer from "./components/layout/footer";
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
     <>
       <Header />
       <Outlet />
+      <Footer />
     </>
   )
 }

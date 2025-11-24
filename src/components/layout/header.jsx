@@ -1,43 +1,134 @@
-//src\components\layout\header.jsx
-import React, { useState } from 'react';
-import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
-import { Menu } from 'antd';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Input } from "antd";
+import {
+    SearchOutlined,
+    SlidersOutlined,
+    HeartOutlined,
+    BellOutlined,
+    SettingOutlined,
+} from "@ant-design/icons";
 
 const Header = () => {
-    const items = [
-        {
-            label: <Link to={"/"}>Home page</Link>,
-            key: 'home',
-            icon: <MailOutlined />,
-        },
-        {
-            label: <Link to={"/user"}>User page</Link>,
-            key: 'user',
-            icon: <MailOutlined />,
-        },
-        {
-            label: 'Welcome',
-            key: 'SubMenu',
-            icon: <SettingOutlined />,
-            children: [
-                { 
-                    label: 'Log In', 
-                    key: 'login' 
-                },
-                { 
-                    label: 'Sign Out', 
-                    key: 'logout' 
-                },
-            ],
-        },
-    ];
+    return (
+        <div
+            style={{
+                width: "100%",
+                padding: "20px 40px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                background: "#FFFFFF",
+                borderBottom: "1px solid #f1f1f1",
+            }}
+        >
+            {/* ========================= LOGO ========================= */}
+            <div
+                style={{
+                    fontSize: 28,
+                    fontWeight: 700,
+                    color: "#3563E9",
+                    letterSpacing: 1,
+                }}
+            >
+                MORENT
+            </div>
 
-    const [current, setCurrent] = useState('mail');
-    const onClick = e => {
-        console.log('click ', e);
-        setCurrent(e.key);
-    };
-    return <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />;
+            {/* ======================= SEARCH BAR ======================= */}
+            <div
+                style={{
+                    flex: 1,
+                    display: "flex",
+                    justifyContent: "center",
+                    padding: "0 40px",
+                }}
+            >
+                <div
+                    style={{
+                        width: "60%",
+                        display: "flex",
+                        alignItems: "center",
+                        background: "#fff",
+                        border: "1px solid #E3E3E3",
+                        borderRadius: 30,
+                        padding: "8px 16px",
+                    }}
+                >
+                    <SearchOutlined style={{ fontSize: 18, color: "#555" }} />
+                    <input
+                        type="text"
+                        placeholder="Search something here"
+                        style={{
+                            flex: 1,
+                            border: "none",
+                            outline: "none",
+                            marginLeft: 10,
+                            fontSize: 16,
+                        }}
+                    />
+                    <SlidersOutlined style={{ fontSize: 20, color: "#555" }} />
+                </div>
+            </div>
+
+            {/* ========================= ICONS ========================== */}
+            <div
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 16,
+                }}
+            >
+                {/* Heart icon */}
+                <div style={iconBoxStyle}>
+                    <HeartOutlined />
+                </div>
+
+                {/* Bell with red dot */}
+                <div style={{ ...iconBoxStyle, position: "relative" }}>
+                    <BellOutlined />
+                    <span
+                        style={{
+                            width: 10,
+                            height: 10,
+                            borderRadius: "50%",
+                            background: "red",
+                            position: "absolute",
+                            top: 6,
+                            right: 6,
+                        }}
+                    ></span>
+                </div>
+
+                {/* Setting */}
+                <div style={iconBoxStyle}>
+                    <SettingOutlined />
+                </div>
+
+                {/* Avatar */}
+                <img
+                    src="https://i.pravatar.cc/300"
+                    alt="avatar"
+                    style={{
+                        width: 42,
+                        height: 42,
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                    }}
+                />
+            </div>
+        </div>
+    );
 };
+
+const iconBoxStyle = {
+    width: 42,
+    height: 42,
+    borderRadius: "50%",
+    border: "1px solid #E8E8E8",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    fontSize: 18,
+};
+
 export default Header;

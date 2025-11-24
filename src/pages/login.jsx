@@ -23,7 +23,7 @@ const LoginPage = () => {
                 description: res.EM || "Login successfully!",
             });
 
-            navigate('/');
+            navigate('/car');
         } else {
             notification.error({
                 message: "Login",

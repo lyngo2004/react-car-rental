@@ -12,6 +12,7 @@ import {
 }
   from "react-router";
 import LoginPage from './pages/login.jsx'
+import CarPage from './pages/car.jsx'
 
 
 let router = createBrowserRouter([
@@ -28,7 +29,11 @@ let router = createBrowserRouter([
       {
         path: "user",
         element: <UserPage />
-      }
+      },
+      {
+        path: "car",
+        element: <CarPage />
+      },
     ]
   },
   {
@@ -39,12 +44,11 @@ let router = createBrowserRouter([
     path: "login",
     element: <LoginPage />
   },
+
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <RouterProvider router={router} />
 );
 
-// ReactDOM.createRoot(root).render(
-//   <RouterProvider router={router} />,
-// );
+
