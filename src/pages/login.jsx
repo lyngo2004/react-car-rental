@@ -1,8 +1,7 @@
-//src\pages\register.jsx
 import React from 'react';
 import { Button, Form, Input, notification } from 'antd';
-import { loginApi } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
+import userApi from '../utils/userApi';
 
 const LoginPage = () => {
 
@@ -11,16 +10,19 @@ const LoginPage = () => {
     const onFinish = async (values) => {
 
         const { username, password } = values;
-        const res = await loginApi(username, password);
+        const res = await userApi.login(username, password);
 
-        //debugger;
+        // debugger;
 
         if (res?.EC === 0) {
+            // LẤY TOKEN ĐÚNG
             localStorage.setItem("accessToken", res.DT.accessToken);
+
             notification.success({
                 message: "Login",
-                description: "Login successfully!",
+                description: res.EM || "Login successfully!",
             });
+
             navigate('/');
         } else {
             notification.error({
@@ -28,9 +30,8 @@ const LoginPage = () => {
                 description: res?.EM ?? "Something went wrong!",
             });
         }
+    };
 
-        console.log('>> Success:', values);
-    }
     return (
         <div style={{ margin: 50 }}>
             <Form
@@ -66,8 +67,7 @@ const LoginPage = () => {
                 </Form.Item>
             </Form>
         </div>
-
-    )
-}
+    );
+};
 
 export default LoginPage;
