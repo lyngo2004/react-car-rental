@@ -1,7 +1,7 @@
 import axios from "axios";
 // Set config defaults when creating the instance
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL
+  baseURL: import.meta.env.VITE_BACKEND_URL || "http://localhost:5000",
 });
 
 // Alter defaults after instance has been created

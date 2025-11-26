@@ -6,6 +6,7 @@ import './styles/global.css'
 import RegisterPage from './pages/register'
 import UserPage from './pages/user.jsx'
 import HomePage from './pages/home.jsx'
+import PaymentPage from './pages/payment.jsx'
 import {
   createBrowserRouter,
   RouterProvider,
@@ -34,6 +35,10 @@ let router = createBrowserRouter([
         path: "car",
         element: <CarPage />
       },
+      {
+        path: "payment",
+        element: <PaymentPage />
+      }
     ]
   },
   {
