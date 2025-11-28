@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import 'antd/dist/reset.css'
 import './styles/global.css'
-import RegisterPage from './pages/register'
+import RegisterPage from './pages/auth/register.jsx'
 import UserPage from './pages/user.jsx'
 import HomePage from './pages/home.jsx'
 import {
@@ -11,7 +11,7 @@ import {
   RouterProvider,
 }
   from "react-router";
-import LoginPage from './pages/login.jsx'
+import LoginPage from './pages/auth/login.jsx'
 import CarPage from './pages/car.jsx'
 
 
