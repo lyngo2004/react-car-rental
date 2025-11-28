@@ -17,13 +17,13 @@ const RegisterPage = () => {
         if (res?.EC === 0 || res?.success) {
             notification.success({
                 message: "Register",
-                description: res?.EM || res?.message || "User created successfully!"
+                description: res.EM || res.message || "User created successfully!"
             });
             navigate("/login");
         } else {
             notification.error({
                 message: "Register",
-                description: res?.EM || res?.message || "Something went wrong!"
+                description: res?.EM ?? res?.message ?? "Something went wrong!"
             });
         }
     };

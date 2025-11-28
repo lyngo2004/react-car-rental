@@ -5,6 +5,9 @@ import carApi from "../../utils/carApi";
 import commonApi from "../../utils/commonApi";
 import { normalizeApiResponse } from "../../utils/apiUtils";
 import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+
+dayjs.extend(isSameOrBefore);
 
 const FilterBar = ({ setCars, onFiltersChange }) => {
 
@@ -23,9 +26,7 @@ const FilterBar = ({ setCars, onFiltersChange }) => {
 
     const timeoutRef = useRef(null);
 
-    // =============================
     // RESET DROPOFF NẾU PICKUP THAY ĐỔI
-    // =============================
     useEffect(() => {
         if (pickupDate || pickupTime) {
             setDropoffDate(null);
@@ -34,9 +35,7 @@ const FilterBar = ({ setCars, onFiltersChange }) => {
     }, [pickupDate, pickupTime]);
 
 
-    // =============================
     // FETCH LOCATIONS + TIMES
-    // =============================
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -60,9 +59,7 @@ const FilterBar = ({ setCars, onFiltersChange }) => {
         fetchData();
     }, []);
 
-    // =============================
     // AUTO SEARCH (DEBOUNCE)
-    // =============================
     useEffect(() => {
         if (
             !pickupLocation ||
@@ -112,20 +109,31 @@ const FilterBar = ({ setCars, onFiltersChange }) => {
         dropoffLocation, dropoffDate, dropoffTime
     ]);
 
+    const disabledPickupTime = (timeString) => {
+        if (!pickupDate) return false;
+
+        const today = dayjs().format("YYYY-MM-DD");
+        const selected = pickupDate.format("YYYY-MM-DD");
+
+        // Nếu pickup date = hôm nay
+        if (selected === today) {
+            const now = dayjs(); // thời điểm hiện tại
+            const time = dayjs(timeString, "HH:mm");
+
+            return time.isSameOrBefore(now);
+        }
+
+        return false;
+    };
 
 
-    // =============================
     // LOGIC RÀNG BUỘC DROP-OFF DATE
-    // =============================
-
     const disabledDropoffDate = (current) => {
-        if (!pickupDate) return true; // ❌ phải chọn pickup trước
+        if (!pickupDate) return true; //  phải chọn pickup trước
         return current && current < pickupDate.startOf("day");
     };
 
-    // =============================
     // LOGIC RÀNG BUỘC DROP-OFF TIME
-    // =============================
     const isSameDay = dropoffDate &&
         pickupDate &&
         dropoffDate.format("YYYY-MM-DD") === pickupDate.format("YYYY-MM-DD");
@@ -145,9 +153,7 @@ const FilterBar = ({ setCars, onFiltersChange }) => {
     };
 
 
-    // =============================
     // JSX RENDER
-    // =============================
     return (
         <div style={{ width: "100%", maxWidth: 1080 }}>
             <div style={{
@@ -198,7 +204,7 @@ const FilterBar = ({ setCars, onFiltersChange }) => {
                             {times.map((t) => {
                                 const value = t.time || t;
                                 return (
-                                    <Select.Option key={value} value={value}>
+                                    <Select.Option key={value} value={value} disabled={disabledPickupTime(value)}>
                                         {value}
                                     </Select.Option>
                                 );
