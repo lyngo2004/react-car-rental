@@ -7,14 +7,13 @@ import RegisterPage from './pages/register'
 import UserPage from './pages/user.jsx'
 import HomePage from './pages/home.jsx'
 import PaymentPage from './pages/payment.jsx'
+import LoginPage from './pages/login.jsx'
+import CarPage from './pages/car.jsx'
 import {
   createBrowserRouter,
   RouterProvider,
 }
-  from "react-router";
-import LoginPage from './pages/login.jsx'
-import CarPage from './pages/car.jsx'
-
+from "react-router";
 
 let router = createBrowserRouter([
   {
@@ -55,5 +54,3 @@ let router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')).render(
   <RouterProvider router={router} />
 );
-
-
