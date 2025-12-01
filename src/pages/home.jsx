@@ -9,9 +9,9 @@ import {
 import carApi from "../utils/carApi";
 
 // Images
-import CarHero1 from "../assets/images/homepage/car1.jpg";
-import CarHero2 from "../assets/images/homepage/car2.jpg";
-import CarHero3 from "../assets/images/homepage/car3.jpg";
+import CarHero1 from "../assets/images/homepage/car1.png";
+import CarHero2 from "../assets/images/homepage/car2.png";
+import CarHero3 from "../assets/images/homepage/car3.png";
 
 import "../styles/home.css";
 
@@ -79,12 +79,36 @@ const HomePage = () => {
         </Col>
 
         <Col span={12}>
-          <Title level={2}>Our Services</Title>
-          <ul style={{ fontSize: 16, lineHeight: "32px" }}>
-            <li><b>Car Hire</b> – We always go the extra mile.</li>
-            <li><b>Car Sales</b> – Best luxury cars at competitive prices.</li>
-            <li><b>Hire a Driver</b> – Safe, comfortable, and reliable.</li>
-          </ul>
+          <Title level={2} className="service-title">Our Services</Title>
+          <div className="service-item">
+            <div className="service-icon"></div>
+            <div>
+              <div className="service-text-title">Car Hire</div>
+              <div className="service-text-desc">
+                We pride ourselves in always going the extra mile for our customers.
+              </div>
+            </div>
+          </div>
+
+          <div className="service-item">
+            <div className="service-icon"></div>
+            <div>
+              <div className="service-text-title">Car Sales</div>
+              <div className="service-text-desc">
+                We sale the best luxury cars across the world at a competitive price.
+              </div>
+            </div>
+          </div>
+
+          <div className="service-item">
+            <div className="service-icon"></div>
+            <div>
+              <div className="service-text-title">Hire a Driver</div>
+              <div className="service-text-desc">
+                If you want to travel and feel comfortable, our drivers are available.
+              </div>
+            </div>
+          </div>
         </Col>
       </Row>
 
