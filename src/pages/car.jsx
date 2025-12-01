@@ -51,7 +51,6 @@ const CarPage = () => {
         });
     };
 
-
     return (
         <div style={{ display: "flex", gap: 20, background: "#F9F9F9", minHeight: "100vh" }}>
 
@@ -74,4 +73,5 @@ const CarPage = () => {
         </div>
     );
 };
+
 export default CarPage;

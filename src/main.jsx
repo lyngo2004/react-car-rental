@@ -13,17 +13,31 @@ import {
   from "react-router";
 import LoginPage from './pages/auth/login.jsx'
 import CarPage from './pages/car.jsx'
+import { Navigate } from 'react-router-dom'
 
 
 let router = createBrowserRouter([
   {
     path: "/",
-    // Component: Root,
-    // loader: loadRootData,
+    element: <Navigate to="/login" replace />
+  },
+
+  {
+    path: "/login",
+    element: <LoginPage />
+  },
+
+  {
+    path: "/register",
+    element: <RegisterPage />
+  },
+
+  {
+    path: "/",
     element: <App />,
     children: [
       {
-        index: true,
+        path: "home",
         element: <HomePage />
       },
       {
@@ -33,18 +47,9 @@ let router = createBrowserRouter([
       {
         path: "car",
         element: <CarPage />
-      },
+      }
     ]
-  },
-  {
-    path: "register",
-    element: <RegisterPage />
-  },
-  {
-    path: "login",
-    element: <LoginPage />
-  },
-
+  }
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
