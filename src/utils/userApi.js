@@ -5,7 +5,7 @@
 //   try {
 //     const URL_API = "api/v1/register";
 //     const res = await axios.post(URL_API, { username, email, password });
-    
+
 //     // res.data chính là dữ liệu thật bạn trả về từ Node.js (success, message, data)
 //     return res;
 //   } catch (error) {
@@ -18,7 +18,7 @@
 //   try {
 //     const URL_API = "api/v1/login";
 //     const res = await axios.post(URL_API, { username, password });
-    
+
 //     // res.data chính là dữ liệu thật bạn trả về từ Node.js (success, message, data)
 //     return res;
 //   } catch (error) {
@@ -34,7 +34,7 @@ import axios from "../utils/axios.customize";
 const userApi = {
   async register(username, email, password) {
     try {
-      const res = await axios.post("api/v1/register", {
+      const res = await axios.post("api/v1/user/register", {
         username,
         email,
         password
@@ -48,7 +48,7 @@ const userApi = {
 
   async login(username, password) {
     try {
-      const res = await axios.post("api/v1/login", {
+      const res = await axios.post("api/v1/user/login", {
         username,
         password
       });

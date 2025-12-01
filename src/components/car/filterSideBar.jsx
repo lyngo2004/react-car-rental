@@ -1,74 +1,154 @@
-import React, { useState } from "react";
-import { Checkbox, Slider, Typography } from "antd";
+import React, { useEffect, useState, useRef } from "react";
+import { Checkbox, Slider, Typography, Spin } from "antd";
+import carApi from "../../utils/carApi";
+import { normalizeApiResponse } from "../../utils/apiUtils";
 
 const { Title, Text } = Typography;
 
-const FilterSideBar = () => {
+const FilterSideBar = ({ onFilter, onFiltersChange }) => {
+    const [types, setTypes] = useState([]);
+    const [capacities, setCapacities] = useState([]);
+    const [priceRange, setPriceRange] = useState({ min: 0, max: 100 });
     const [price, setPrice] = useState(100);
+    const [selectedTypes, setSelectedTypes] = useState([]);
+    const [selectedCapacities, setSelectedCapacities] = useState([]);
+    const [loadingFilters, setLoadingFilters] = useState(false);
+    const debounceRef = useRef(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoadingFilters(true);
+                const res = await carApi.getFilterOptions();
+                const data = normalizeApiResponse(res);
+                if (data) {
+                    setTypes(data.types || []);
+                    setCapacities(data.capacities || []);
+                    const min = Number(data.price?.minPrice ?? 0);
+                    const max = Number(data.price?.maxPrice ?? 0);
+                    setPriceRange({ min, max });
+                    setPrice(max);
+                }
+            } catch (err) {
+                console.error("filterSideBar.fetchData error:", err);
+            } finally {
+                setLoadingFilters(false);
+            }
+        };
+        fetchData();
+        return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+    }, []);
+
+    const applyFilters = async ({ type, capacity, min, max } = {}) => {
+        // Nếu tất cả filter đều rỗng → load full list
+        if (
+            (!type || type.length === 0) &&
+            (!capacity || capacity.length === 0) &&
+            min === priceRange.min &&
+            max === priceRange.max
+        ) {
+            onFiltersChange?.({ reset: true });
+            return;
+        }
+
+        // Normalize price default
+        const isDefaultPrice = (min === priceRange.min && max === priceRange.max);
+        const effectiveMin = isDefaultPrice ? undefined : min;
+        const effectiveMax = isDefaultPrice ? undefined : max;
+        const params = {};
+        if (type && type.length > 0) params.type = type;
+        if (capacity && capacity.length > 0) params.capacity = capacity;
+        if (effectiveMin !== undefined && effectiveMin !== null) params.min = effectiveMin;
+        if (effectiveMax !== undefined && effectiveMax !== null) params.max = effectiveMax;
+
+        // Notify parent; parent will call filterByFilters and set cars
+        onFiltersChange?.(params);
+    };
+
+    const applyFiltersDebounced = ({ type, capacity, min, max } = {}) => {
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => applyFilters({ type, capacity, min, max }), 400);
+    };
+
+    const handleTypeChange = (checked, value) => {
+        setSelectedTypes(prev => {
+            const next = checked ? [...prev, value] : prev.filter(v => v !== value);
+            applyFiltersDebounced({ type: next, capacity: selectedCapacities, min: priceRange.min, max: price });
+            return next;
+        });
+    };
+
+    const handleCapacityChange = (checked, value) => {
+        setSelectedCapacities(prev => {
+            const next = checked ? [...prev, value] : prev.filter(v => v !== value);
+            applyFiltersDebounced({ type: selectedTypes, capacity: next, min: priceRange.min, max: price });
+            return next;
+        });
+    };
+
+    const handlePriceChange = (value) => {
+        setPrice(value);
+        applyFiltersDebounced({ type: selectedTypes, capacity: selectedCapacities, min: priceRange.min, max: value });
+    };
 
     return (
-        <div
-            style={{
-                width: 250,
-                background: "#fff",
-                padding: 30,
-            }}
-        >
-            {/*  TYPE */}
-            <div style={{ marginBottom: 30 }}>
-                <Title level={5} style={{ marginBottom: 15, color: "#90A3BF" }}>
-                    TYPE
-                </Title>
+        <Spin spinning={loadingFilters}>
+            <div style={{ width: 250, height: "100%", background: "#fff", padding: 30 }}>
+                {/* TYPE */}
+                <div style={{ marginBottom: 30 }}>
+                    <Title level={5} style={{ marginBottom: 15, color: "#90A3BF" }}>
+                        TYPE
+                    </Title>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                        {types.map((t) => (
+                            <Checkbox
+                                key={t.CarType}
+                                checked={selectedTypes.includes(t.CarType)}
+                                onChange={(e) => handleTypeChange(e.target.checked, t.CarType)}
+                            >
+                                {t.CarType} ({t.count})
+                            </Checkbox>
+                        ))}
+                    </div>
+                </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    <Checkbox defaultChecked>Sport (10)</Checkbox>
-                    <Checkbox defaultChecked>SUV (12)</Checkbox>
-                    <Checkbox>MPV (16)</Checkbox>
-                    <Checkbox>Sedan (20)</Checkbox>
-                    <Checkbox>Coupe (14)</Checkbox>
-                    <Checkbox>Hatchback (14)</Checkbox>
+                {/* CAPACITY */}
+                <div style={{ marginBottom: 30 }}>
+                    <Title level={5} style={{ marginBottom: 15, color: "#90A3BF" }}>
+                        CAPACITY
+                    </Title>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                        {capacities.map((c) => (
+                            <Checkbox
+                                key={c.Capacity}
+                                checked={selectedCapacities.includes(c.Capacity)}
+                                onChange={(e) => handleCapacityChange(e.target.checked, c.Capacity)}
+                            >
+                                {c.Capacity} Person ({c.count})
+                            </Checkbox>
+                        ))}
+                    </div>
+                </div>
+
+                {/* PRICE */}
+                <div>
+                    <Title level={5} style={{ marginBottom: 15, color: "#90A3BF" }}>
+                        PRICE
+                    </Title>
+                    <Slider
+                        min={priceRange.min}
+                        max={priceRange.max}
+                        value={price}
+                        onChange={(val) => setPrice(val)}
+                        onAfterChange={handlePriceChange}
+                        trackStyle={{ backgroundColor: "#3563E9", height: 6 }}
+                    />
+                    <Text style={{ color: "#1A202C", fontSize: 16 }}>
+                        Max. ${price}.00
+                    </Text>
                 </div>
             </div>
-
-            {/* CAPACITY */}
-            <div style={{ marginBottom: 30 }}>
-                <Title level={5} style={{ marginBottom: 15, color: "#90A3BF" }}>
-                    CAPACITY
-                </Title>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    <Checkbox defaultChecked>2 Person (10)</Checkbox>
-                    <Checkbox>4 Person (14)</Checkbox>
-                    <Checkbox>6 Person (12)</Checkbox>
-                    <Checkbox defaultChecked>8 or More (16)</Checkbox>
-                </div>
-            </div>
-
-            {/* PRICE */}
-            <div>
-                <Title level={5} style={{ marginBottom: 15, color: "#90A3BF" }}>
-                    PRICE
-                </Title>
-
-                <Slider
-                    min={0}
-                    max={100}
-                    value={price}
-                    onChange={(value) => setPrice(value)}
-                    trackStyle={{ backgroundColor: "#3563E9", height: 6 }}
-                    handleStyle={{
-                        borderColor: "#3563E9",
-                        backgroundColor: "#3563E9",
-                        width: 16,
-                        height: 16,
-                    }}
-                />
-
-                <Text style={{ color: "#1A202C", fontSize: 16 }}>
-                    Max. ${price}.00
-                </Text>
-            </div>
-        </div>
+        </Spin>
     );
 };
 
