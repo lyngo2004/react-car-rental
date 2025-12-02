@@ -6,6 +6,9 @@ import './styles/global.css'
 import RegisterPage from './pages/auth/register.jsx'
 import UserPage from './pages/user.jsx'
 import HomePage from './pages/home.jsx'
+import PaymentPage from './pages/payment.jsx'
+import LoginPage from './pages/login.jsx'
+import CarPage from './pages/car.jsx'
 import {
   createBrowserRouter,
   RouterProvider,
@@ -55,5 +58,3 @@ let router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')).render(
   <RouterProvider router={router} />
 );
-
-
