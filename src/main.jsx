@@ -7,16 +7,15 @@ import RegisterPage from './pages/auth/register.jsx'
 import UserPage from './pages/user.jsx'
 import HomePage from './pages/home.jsx'
 import PaymentPage from './pages/payment.jsx'
-import LoginPage from './pages/login.jsx'
+import LoginPage from './pages/auth/login.jsx'
 import CarPage from './pages/car.jsx'
+import { Navigate } from 'react-router-dom'
+
 import {
   createBrowserRouter,
   RouterProvider,
 }
   from "react-router";
-import LoginPage from './pages/auth/login.jsx'
-import CarPage from './pages/car.jsx'
-import { Navigate } from 'react-router-dom'
 
 
 let router = createBrowserRouter([
@@ -50,6 +49,10 @@ let router = createBrowserRouter([
       {
         path: "car",
         element: <CarPage />
+      },
+      {
+        path: "payment",
+        element: <PaymentPage />
       }
     ]
   }
