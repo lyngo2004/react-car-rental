@@ -7,23 +7,39 @@ import RegisterPage from './pages/auth/register.jsx'
 import UserPage from './pages/user.jsx'
 import HomePage from './pages/home.jsx'
 import PaymentPage from './pages/payment.jsx'
-import LoginPage from './pages/login.jsx'
+import LoginPage from './pages/auth/login.jsx'
 import CarPage from './pages/car.jsx'
+import { Navigate } from 'react-router-dom'
+
 import {
   createBrowserRouter,
   RouterProvider,
 }
-from "react-router";
+  from "react-router";
+
 
 let router = createBrowserRouter([
   {
     path: "/",
-    // Component: Root,
-    // loader: loadRootData,
+    element: <Navigate to="/login" replace />
+  },
+
+  {
+    path: "/login",
+    element: <LoginPage />
+  },
+
+  {
+    path: "/register",
+    element: <RegisterPage />
+  },
+
+  {
+    path: "/",
     element: <App />,
     children: [
       {
-        index: true,
+        path: "home",
         element: <HomePage />
       },
       {
@@ -39,16 +55,7 @@ let router = createBrowserRouter([
         element: <PaymentPage />
       }
     ]
-  },
-  {
-    path: "register",
-    element: <RegisterPage />
-  },
-  {
-    path: "login",
-    element: <LoginPage />
-  },
-
+  }
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
