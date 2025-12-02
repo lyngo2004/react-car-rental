@@ -68,7 +68,7 @@ const CarPage = () => {
                 <FilterBar setCars={setCars} onFiltersChange={handleFiltersChange} />
 
                 {/* Car Cards */}
-                <CarCard cars={cars} />
+                <CarCard cars={cars} filters={filters} />
             </div>
         </div>
     );

@@ -1,5 +1,6 @@
 import React from "react";
 import { Input } from "antd";
+import { useNavigate } from "react-router-dom";
 import {
     SearchOutlined,
     SlidersOutlined,
@@ -9,6 +10,8 @@ import {
 } from "@ant-design/icons";
 
 const Header = () => {
+    const navigate = useNavigate();
+
     return (
         <div
             style={{
@@ -23,11 +26,14 @@ const Header = () => {
         >
             {/* ========================= LOGO ========================= */}
             <div
+                onClick={() => navigate("/car")}
                 style={{
                     fontSize: 28,
                     fontWeight: 700,
                     color: "#3563E9",
                     letterSpacing: 1,
+                    cursor: "pointer",
+                    userSelect: "none",
                 }}
             >
                 MORENT
@@ -115,7 +121,7 @@ const Header = () => {
                     }}
                 />
             </div>
-        </div>
+        </div >
     );
 };
 
