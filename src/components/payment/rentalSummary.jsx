@@ -1,25 +1,35 @@
 import React from "react";
 import { Card, Row, Col, Typography, Divider, Input, Button } from "antd";
 import { StarFilled } from "@ant-design/icons";
+import dayjs from "dayjs";
 
 const { Title, Text } = Typography;
 
-const RentalSummary = () => {
-  // dynamic variables (later BE will control)
-  const carName = localStorage.getItem("CAR_NAME") || "Car name here";
-  const carImage = localStorage.getItem("CAR_IMAGE") || "";
-  const carPrice = Number(localStorage.getItem("CAR_PRICE") || 0);
+const RentalSummary = ({ car, rentalInfo }) => {
+  const { pickupDate, pickupTime, dropoffDate, dropoffTime } = rentalInfo;
 
-  const ratings = localStorage.getItem("CAR_RATING") || 0;
-  const reviewers = localStorage.getItem("CAR_REVIEWERS") || "0 Reviewer";
+  let rentalDays = 1;
+  if (pickupDate && dropoffDate && pickupTime && dropoffTime) {
+    const start = dayjs(`${pickupDate.format("YYYY-MM-DD")} ${pickupTime}`);
+    const end = dayjs(`${dropoffDate.format("YYYY-MM-DD")} ${dropoffTime}`);
 
-  const subtotal = Number(localStorage.getItem("SUBTOTAL") || 0);
-  const tax = Number(localStorage.getItem("TAX") || 0);
+    rentalDays = Math.max(1, end.diff(start, "day"));
+  }
+
+  const carName = `${car.Brand} ${car.Model}`;
+  const pricePerDay = Number(car.PricePerDay);
+
+  const subtotal = pricePerDay * rentalDays;
+  const tax = subtotal * 0.08;
   const total = subtotal + tax;
+
+  const ratings = 4.0;
+  const reviewers = "440 Reviewer";
+
 
   return (
     <Card style={{ borderRadius: 16 }}>
-      
+
       {/* Title */}
       <Title level={4} style={{ marginBottom: 4 }}>
         Rental Summary
@@ -44,9 +54,9 @@ const RentalSummary = () => {
               alignItems: "center",
             }}
           >
-            {carImage ? (
+            {car.ImagePath ? (
               <img
-                src={carImage}
+                src={car.ImagePath}
                 alt="car"
                 style={{ width: "90%", borderRadius: 8 }}
               />
@@ -69,13 +79,21 @@ const RentalSummary = () => {
 
           <div style={{ marginTop: 6 }}>
             <Title level={5} style={{ margin: 0 }}>
-              ${carPrice.toFixed(2)}
+              ${pricePerDay.toFixed(2)}
             </Title>
           </div>
         </Col>
       </Row>
 
       <Divider />
+
+      <Row style={{ marginBottom: 12 }}>
+        <Col span={12}><Text>Rental Days</Text></Col>
+        <Col span={12} style={{ textAlign: "right" }}>
+          <Text strong>{rentalDays} day(s)</Text>
+        </Col>
+      </Row>
+
 
       {/* Subtotal */}
       <Row style={{ marginBottom: 12 }}>

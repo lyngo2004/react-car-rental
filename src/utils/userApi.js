@@ -1,34 +1,3 @@
-// //src\utils\api.js
-// import axios from './axios.customize'
-
-// const creatUserApi = async (username, email, password) => {
-//   try {
-//     const URL_API = "api/v1/register";
-//     const res = await axios.post(URL_API, { username, email, password });
-
-//     // res.data chính là dữ liệu thật bạn trả về từ Node.js (success, message, data)
-//     return res;
-//   } catch (error) {
-//     console.error("Error in creatUserApi:", error.response?.data || error.message);
-//     return null;
-//   }
-// };
-
-// const loginApi = async (username, password) => {
-//   try {
-//     const URL_API = "api/v1/login";
-//     const res = await axios.post(URL_API, { username, password });
-
-//     // res.data chính là dữ liệu thật bạn trả về từ Node.js (success, message, data)
-//     return res;
-//   } catch (error) {
-//     console.error("Error in loginApi:", error.response?.data || error.message);
-//     return null;
-//   }
-// };
-
-// export { creatUserApi, loginApi };
-
 import axios from "../utils/axios.customize";
 
 const userApi = {
@@ -55,6 +24,16 @@ const userApi = {
       return res;
     } catch (error) {
       console.error("userApi.login error:", error.response?.data || error);
+      return null;
+    }
+  },
+
+  async getMe() {
+    try {
+      const res = await axios.get("api/v1/customer/me");
+      return res;      
+    } catch (error) {
+      console.error("userApi.getMe error:", error.response?.data || error);
       return null;
     }
   }

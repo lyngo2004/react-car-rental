@@ -4,34 +4,55 @@ import {
     SettingOutlined,
     DashboardOutlined,
 } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
 const cardStyle = {
     borderRadius: 16,
-    height: 480,                // cố định chiều cao card
+    height: 480,
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
 };
 
-const CarCard = ({ cars = [] }) => {
+const CarCard = ({ cars = [], filters = {} }) => {
+    const navigate = useNavigate();
+
+    const handleGoDetail = (car) => {
+        if (!car?.CarId) return;
+
+        console.log("Rental info gửi sang CarDetail:", filters);
+
+        navigate(`/car/${car.CarId}`, {
+            state: { car, cars, rentalInfo: filters, },
+        });
+    };
+
     const cardWidth = 360;
-    const wrapperMaxWidth = 1080; // match FilterBar maxWidth
+    const wrapperMaxWidth = 1080;
     const isSingle = cars.length === 1;
-    const isMulti3OrMore = cars.length >= 3;
-    // wrapper becomes the centered block for 3-per-row; for 1/2 it still uses wrapperMaxWidth so alignment matches filterbar
-    const wrapperWidth = isSingle ? cardWidth : '100%';
+
+    const wrapperWidth = isSingle ? cardWidth : "100%";
+
     return (
         <div style={{ padding: "30px 30px", flex: 1 }}>
-            <div style={{ width: wrapperWidth, margin: isSingle ? '0 auto' : '0' }}>
+            <div style={{ width: wrapperWidth, margin: isSingle ? "0 auto" : "0" }}>
                 <Row gutter={[24, 24]} justify="start" align="top">
                     {cars.map((car, index) => (
-                        <Col xs={24} sm={12} md={12} lg={cars.length === 1 || cars.length === 2 ? 12 : 8} key={car.Id || car.id || index} style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                        <Col
+                            xs={24}
+                            sm={12}
+                            md={12}
+                            lg={cars.length === 1 || cars.length === 2 ? 12 : 8}
+                            key={car.CarId || index}
+                            style={{ display: "flex", justifyContent: "flex-start" }}
+                        >
                             <div style={{ width: 360, minWidth: 360 }}>
                                 <Card
                                     hoverable
-                                    style={{ ...cardStyle, width: '100%' }}
+                                    onClick={() => handleGoDetail(car)}    // ⬅ click card → detail
+                                    style={{ ...cardStyle, width: "100%" }}
                                     bodyStyle={{
                                         display: "flex",
                                         flexDirection: "column",
@@ -40,11 +61,29 @@ const CarCard = ({ cars = [] }) => {
                                     }}
                                 >
                                     {/* TITLE */}
-                                    <Space direction="vertical" size={0} style={{ width: '100%' }}>
-                                        <Title level={4} style={{ margin: 0, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '100%' }}>
+                                    <Space direction="vertical" size={0} style={{ width: "100%" }}>
+                                        <Title
+                                            level={4}
+                                            style={{
+                                                margin: 0,
+                                                whiteSpace: "nowrap",
+                                                textOverflow: "ellipsis",
+                                                overflow: "hidden",
+                                                maxWidth: "100%",
+                                            }}
+                                        >
                                             {car.Brand} {car.Model}
                                         </Title>
-                                        <Text type="secondary" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{car.CarType}</Text>
+                                        <Text
+                                            type="secondary"
+                                            style={{
+                                                whiteSpace: "nowrap",
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
+                                            }}
+                                        >
+                                            {car.CarType}
+                                        </Text>
                                     </Space>
 
                                     {/* IMAGE */}
@@ -70,18 +109,28 @@ const CarCard = ({ cars = [] }) => {
                                                 draggable={false}
                                             />
                                         ) : (
-                                            <div style={{ width: 200, height: 120, background: '#f1f1f1', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8 }}>
-                                                <span style={{ color: '#9aa0a6' }}>No Image</span>
+                                            <div
+                                                style={{
+                                                    width: 200,
+                                                    height: 120,
+                                                    background: "#f1f1f1",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    borderRadius: 8,
+                                                }}
+                                            >
+                                                <span style={{ color: "#9aa0a6" }}>No Image</span>
                                             </div>
                                         )}
                                     </div>
 
-                                    {/* SPECS (CENTER ALIGN) */}
+                                    {/* SPECS */}
                                     <Space
                                         size="large"
                                         style={{
                                             width: "100%",
-                                            justifyContent: "center",   // căn giữa toàn bộ
+                                            justifyContent: "center",
                                             marginBottom: 15,
                                         }}
                                     >
@@ -110,13 +159,22 @@ const CarCard = ({ cars = [] }) => {
                                         }}
                                     >
                                         <div>
-                                            <Title level={4} style={{ marginBottom: 0, whiteSpace: 'nowrap' }}>
+                                            <Title level={4} style={{ marginBottom: 0, whiteSpace: "nowrap" }}>
                                                 ${car.PricePerDay}/day
                                             </Title>
-                                            <Text delete type="secondary">${car.PricePerDay + 10}</Text>
+                                            <Text delete type="secondary">
+                                                ${Number(car.PricePerDay) + 10}
+                                            </Text>
                                         </div>
 
-                                        <Button type="primary" size="large">
+                                        <Button
+                                            type="primary"
+                                            size="large"
+                                            onClick={(e) => {
+                                                e.stopPropagation();     // ⬅ không trigger onClick Card
+                                                handleGoDetail(car);
+                                            }}
+                                        >
                                             Rent Now
                                         </Button>
                                     </div>
@@ -131,3 +189,4 @@ const CarCard = ({ cars = [] }) => {
 };
 
 export default CarCard;
+

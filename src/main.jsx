@@ -9,6 +9,7 @@ import HomePage from './pages/home.jsx'
 import PaymentPage from './pages/payment.jsx'
 import LoginPage from './pages/auth/login.jsx'
 import CarPage from './pages/car.jsx'
+import CarDetailPage from './pages/carDetail.jsx'
 import { Navigate } from 'react-router-dom'
 
 import {
@@ -49,6 +50,10 @@ let router = createBrowserRouter([
       {
         path: "car",
         element: <CarPage />
+      },
+      {
+        path: "car/:carId",
+        element: <CarDetailPage />
       },
       {
         path: "payment",
