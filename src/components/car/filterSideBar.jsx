@@ -5,7 +5,7 @@ import { normalizeApiResponse } from "../../utils/apiUtils";
 
 const { Title, Text } = Typography;
 
-const FilterSideBar = ({ onFilter, onFiltersChange }) => {
+const FilterSideBar = ({ onFilter, onFiltersChange, initialFilters }) => {
     const [types, setTypes] = useState([]);
     const [capacities, setCapacities] = useState([]);
     const [priceRange, setPriceRange] = useState({ min: 0, max: 100 });
@@ -14,6 +14,31 @@ const FilterSideBar = ({ onFilter, onFiltersChange }) => {
     const [selectedCapacities, setSelectedCapacities] = useState([]);
     const [loadingFilters, setLoadingFilters] = useState(false);
     const debounceRef = useRef(null);
+    const [initializedFromProps, setInitializedFromProps] = useState(false);
+
+    useEffect(() => {
+        if (!initialFilters || initializedFromProps) return;
+
+        const { type, capacity, min, max } = initialFilters;
+
+        if (Array.isArray(type)) {
+            setSelectedTypes(type);
+        }
+        if (Array.isArray(capacity)) {
+            setSelectedCapacities(capacity);
+        }
+        if (typeof max === "number") {
+            setPrice(max);
+        }
+        if (typeof min === "number" || typeof max === "number") {
+            setPriceRange((prev) => ({
+                min: typeof min === "number" ? min : prev.min,
+                max: typeof max === "number" ? max : prev.max,
+            }));
+        }
+
+        setInitializedFromProps(true);
+    }, [initialFilters, initializedFromProps]);
 
     useEffect(() => {
         const fetchData = async () => {

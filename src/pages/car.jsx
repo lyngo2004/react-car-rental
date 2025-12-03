@@ -28,7 +28,14 @@ const CarPage = () => {
     const handleFiltersChange = (newFilters) => {
         // CASE 1: reset toàn bộ filters
         if (newFilters.reset) {
-            setFilters({});
+            setFilters(prev => ({
+                pickupLocation: prev.pickupLocation || null,
+                pickupDate: prev.pickupDate || null,
+                pickupTime: prev.pickupTime || null,
+                dropoffLocation: prev.dropoffLocation || null,
+                dropoffDate: prev.dropoffDate || null,
+                dropoffTime: prev.dropoffTime || null
+            }));
             fetchCars();   // load full list từ backend
             return;
         }
@@ -68,7 +75,7 @@ const CarPage = () => {
                 <FilterBar setCars={setCars} onFiltersChange={handleFiltersChange} />
 
                 {/* Car Cards */}
-                <CarCard cars={cars} />
+                <CarCard cars={cars} filters={filters} />
             </div>
         </div>
     );

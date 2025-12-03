@@ -40,7 +40,17 @@ const carApi = {
             console.error("carApi.filterByFilters error:", error.response?.data || error);
             return null;
         }
-    }
+    },
+
+    async getCarById(id) {
+        try {
+            const res = await axios.get(`api/v1/car/${id}`);
+            return res;
+        } catch (error) {
+            console.error("carApi.getCarById error:", error.response?.data || error);
+            return null;
+        }
+    },
 }
 
 export default carApi;
