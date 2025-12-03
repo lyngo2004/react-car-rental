@@ -1,40 +1,44 @@
-import React from "react";
-import Header from "../components/layout/header";
-import Footer from "../components/layout/footer";
+import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
+import { Row, Col } from "antd";
+import dayjs from "dayjs";
 
-// Main components for this page (payment section on the left, summary on the right)
 import PaymentForm from "../components/payment/paymentForm";
 import RentalSummary from "../components/payment/rentalSummary";
 
-import { Row, Col } from "antd";
-
-/**
- * PaymentPage
- * This is the main page container for the Payment flow.
- * Layout:
- *   - Header (top navigation bar)
- *   - PaymentForm on the left (billing info, rental info, payment method)
- *   - RentalSummary on the right (car info + price calc)
- *   - Footer at bottom
- */
 const PaymentPage = () => {
-  return (
-    <>
-      {/* Body section with gray background */}
-      <div style={{ padding: "40px 80px", background: "#F6F7F9" }}>
-        <Row gutter={32}>
-          {/* Payment form section */}
-          <Col xs={24} lg={16}>
-            <PaymentForm />
-          </Col>
 
-          {/* Rental summary section */}
-          <Col xs={24} lg={8}>
-            <RentalSummary />
-          </Col>
-        </Row>
-      </div>
-    </>
+  const { state } = useLocation();
+  const car = state?.car || null;
+
+  // rental info từ CarPage hoặc CarDetail
+  const rentalInfoFromState = state?.rentalInfo || null;
+
+  // payment state (editable)
+  const [rentalInfo, setRentalInfo] = useState({
+    pickupLocation: rentalInfoFromState?.pickupLocation || null,
+    pickupDate: rentalInfoFromState?.pickupDate ? dayjs(rentalInfoFromState.pickupDate) : null,
+    pickupTime: rentalInfoFromState?.pickupTime || null,
+    dropoffLocation: rentalInfoFromState?.dropoffLocation || null,
+    dropoffDate: rentalInfoFromState?.dropoffDate ? dayjs(rentalInfoFromState.dropoffDate) : null,
+    dropoffTime: rentalInfoFromState?.dropoffTime || null,
+  });
+
+  console.log("Rental info gửi sang PaymentForm:", rentalInfo);
+
+
+  return (
+    <div style={{ padding: "40px 80px", background: "#F6F7F9" }}>
+      <Row gutter={32}>
+        <Col xs={24} lg={16}>
+          <PaymentForm rentalInfo={rentalInfo} setRentalInfo={setRentalInfo} />
+        </Col>
+
+        <Col xs={24} lg={8}>
+          <RentalSummary car={car} rentalInfo={rentalInfo} />
+        </Col>
+      </Row>
+    </div>
   );
 };
 

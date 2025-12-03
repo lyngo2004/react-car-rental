@@ -21,8 +21,11 @@ const CarCard = ({ cars = [], filters = {} }) => {
 
     const handleGoDetail = (car) => {
         if (!car?.CarId) return;
+
+        console.log("Rental info gửi sang CarDetail:", filters);
+
         navigate(`/car/${car.CarId}`, {
-            state: { car, cars, filters, },
+            state: { car, cars, rentalInfo: filters, },
         });
     };
 

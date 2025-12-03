@@ -1,121 +1,262 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Card,
-  Row,
-  Col,
-  Input,
-  Select,
-  DatePicker,
-  Radio,
-  Checkbox,
-  Button,
-  Space,
-  Typography,
-  message
+  Card, Row, Col, Select, DatePicker, Radio, Space, Typography,
+  Input, Button, Checkbox
 } from "antd";
 
-// Payment method icons (AntD built-in)
-import { BankOutlined, DollarOutlined, LockOutlined, WalletOutlined } from "@ant-design/icons";
+import {
+  WalletOutlined,
+  BankOutlined,
+  DollarOutlined,
+  LockOutlined
+} from "@ant-design/icons";
+
+import commonApi from "../../utils/commonApi";
+import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+dayjs.extend(isSameOrBefore);
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-/**
- * PaymentForm Component
- * Responsibilities:
- *   - Display Billing Info form
- *   - Display Rental Info
- *   - Display Payment Method options (Momo, Bank Transfer, COD)
- */
-const PaymentForm = () => {
-  const [method, setMethod] = useState("momo"); // default method
+const PaymentForm = ({ rentalInfo, setRentalInfo }) => {
 
-  /**
-   * "Rent Now" button (Demo mode: no API call)
-   */
+  const [locations, setLocations] = useState([]);
+  const [times, setTimes] = useState([]);
+  const [loadingLocations, setLoadingLocations] = useState(false);
+  const [loadingTimes, setLoadingTimes] = useState(false);
+
+  const [method, setMethod] = useState("momo");
+
+  // FETCH LOCATIONS + TIMES
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoadingLocations(true);
+        setLoadingTimes(true);
+
+        const locRes = await commonApi.getLocations();
+        const timeRes = await commonApi.getTimeSlots();
+
+        if (Array.isArray(locRes?.DT)) setLocations(locRes.DT);
+        if (Array.isArray(timeRes?.DT)) setTimes(timeRes.DT);
+
+      } finally {
+        setLoadingLocations(false);
+        setLoadingTimes(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // RESET dropoff when pickup changes
+  useEffect(() => {
+    if (!rentalInfo.pickupDate || !rentalInfo.pickupTime) return;
+
+    if (!rentalInfo._lastPickup) {
+      setRentalInfo(prev => ({
+        ...prev,
+        _lastPickup: `${rentalInfo.pickupDate}-${rentalInfo.pickupTime}`
+      }));
+      return;
+    }
+
+    // Nếu user thay đổi pickup → reset dropoff
+    const current = `${rentalInfo.pickupDate}-${rentalInfo.pickupTime}`;
+    if (rentalInfo._lastPickup !== current) {
+      setRentalInfo(prev => ({
+        ...prev,
+        dropoffDate: null,
+        dropoffTime: null,
+        _lastPickup: current
+      }));
+    }
+  }, [rentalInfo.pickupDate, rentalInfo.pickupTime]);
+
+
+  // DISABLED pick-up time
+  const disabledPickupTime = (timeString) => {
+    if (!rentalInfo.pickupDate) return false;
+
+    const today = dayjs().format("YYYY-MM-DD");
+    const selected = rentalInfo.pickupDate.format("YYYY-MM-DD");
+
+    if (selected === today) {
+      const now = dayjs();
+      const time = dayjs(timeString, "HH:mm");
+      return time.isSameOrBefore(now);
+    }
+    return false;
+  };
+
+  // DISABLED drop-off date
+  const disabledDropoffDate = (current) => {
+    if (!rentalInfo.pickupDate) return true;
+    return current && current < rentalInfo.pickupDate.startOf("day");
+  };
+
+  // -------------------------------
+  // DISABLED drop-off time (same day)
+  // -------------------------------
+  const sameDay =
+    rentalInfo.dropoffDate &&
+    rentalInfo.pickupDate &&
+    rentalInfo.dropoffDate.format("YYYY-MM-DD") === rentalInfo.pickupDate.format("YYYY-MM-DD");
+
+  const disabledDropoffTime = (timeString) => {
+    if (!rentalInfo.pickupDate || !rentalInfo.pickupTime || !rentalInfo.dropoffDate)
+      return false;
+
+    if (sameDay) {
+      return dayjs(timeString, "HH:mm").isSameOrBefore(
+        dayjs(rentalInfo.pickupTime, "HH:mm")
+      );
+    }
+    return false;
+  };
+
   const handleRentNow = () => {
-    message.success("Demo mode: Rental submission is disabled.");
+    console.log("SUBMIT RENT: ", rentalInfo);
   };
 
   return (
     <Space direction="vertical" size="large" style={{ width: "100%" }}>
-      
-      {/* BILLING INFO SECTION */}
+
+      {/* BILLING INFO */}
       <Card>
         <Title level={4}>Billing Info</Title>
         <Text type="secondary">Please enter your billing info</Text>
 
         <Row gutter={20} style={{ marginTop: 20 }}>
-          <Col span={12}>
-            <Input placeholder="Your name" />
-          </Col>
-          <Col span={12}>
-            <Input placeholder="Phone number" />
-          </Col>
+          <Col span={12}><Input placeholder="Your name" /></Col>
+          <Col span={12}><Input placeholder="Phone number" /></Col>
+
           <Col span={12} style={{ marginTop: 16 }}>
             <Input placeholder="Address" />
           </Col>
+
           <Col span={12} style={{ marginTop: 16 }}>
             <Input placeholder="Town / City" />
           </Col>
         </Row>
       </Card>
 
-      {/* RENTAL INFO SECTION */}
+
+      {/* RENTAL INFO */}
       <Card>
         <Title level={4}>Rental Info</Title>
         <Text type="secondary">Please select your rental date</Text>
 
         <Space direction="vertical" style={{ width: "100%", marginTop: 20 }}>
-          {/* PICK-UP SECTION */}
+
+          {/* PICK-UP */}
           <Radio checked>Pick-Up</Radio>
 
           <Row gutter={16}>
             <Col span={8}>
-              <Select placeholder="City" style={{ width: "100%" }}>
-                <Option value="Hanoi">Hanoi</Option>
-                <Option value="Ho Chi Minh">Ho Chi Minh</Option>
+              <Select
+                placeholder="Location"
+                style={{ width: "100%" }}
+                value={rentalInfo.pickupLocation}
+                loading={loadingLocations}
+                onChange={(value) =>
+                  setRentalInfo(prev => ({ ...prev, pickupLocation: value }))
+                }
+              >
+                {locations.map((loc) => (
+                  <Option key={loc} value={loc}>{loc}</Option>
+                ))}
               </Select>
             </Col>
 
             <Col span={8}>
-              <DatePicker placeholder="Select date" style={{ width: "100%" }} />
+              <DatePicker
+                placeholder="Date"
+                style={{ width: "100%" }}
+                value={rentalInfo.pickupDate}
+                onChange={(date) =>
+                  setRentalInfo(prev => ({ ...prev, pickupDate: date }))
+                }
+                disabledDate={(cur) => cur && cur < dayjs().startOf("day")}
+              />
             </Col>
 
             <Col span={8}>
-              <Select placeholder="Time" style={{ width: "100%" }}>
-                <Option value="09:00">09:00</Option>
-                <Option value="10:00">10:00</Option>
+              <Select
+                placeholder="Time"
+                style={{ width: "100%" }}
+                value={rentalInfo.pickupTime}
+                disabled={!rentalInfo.pickupDate}
+                onChange={(value) =>
+                  setRentalInfo(prev => ({ ...prev, pickupTime: value }))
+                }
+              >
+                {times.map((t) => (
+                  <Option key={t} value={t} disabled={disabledPickupTime(t)}>
+                    {t}
+                  </Option>
+                ))}
               </Select>
             </Col>
           </Row>
 
-          {/* DROP-OFF SECTION */}
+
+          {/* DROP-OFF */}
           <Radio checked style={{ marginTop: 20 }}>Drop-Off</Radio>
 
           <Row gutter={16}>
             <Col span={8}>
-              <Select placeholder="City" style={{ width: "100%" }}>
-                <Option value="Hanoi">Hanoi</Option>
-                <Option value="Ho Chi Minh">Ho Chi Minh</Option>
+              <Select
+                placeholder="Location"
+                style={{ width: "100%" }}
+                value={rentalInfo.dropoffLocation}
+                disabled={!rentalInfo.pickupLocation}
+                onChange={(value) =>
+                  setRentalInfo(prev => ({ ...prev, dropoffLocation: value }))
+                }
+              >
+                {locations.map((loc) => (
+                  <Option key={loc} value={loc}>{loc}</Option>
+                ))}
               </Select>
             </Col>
 
             <Col span={8}>
-              <DatePicker placeholder="Select date" style={{ width: "100%" }} />
+              <DatePicker
+                placeholder="Date"
+                style={{ width: "100%" }}
+                value={rentalInfo.dropoffDate}
+                onChange={(date) =>
+                  setRentalInfo(prev => ({ ...prev, dropoffDate: date }))
+                }
+                disabled={!rentalInfo.pickupDate}
+                disabledDate={disabledDropoffDate}
+              />
             </Col>
 
             <Col span={8}>
-              <Select placeholder="Time" style={{ width: "100%" }}>
-                <Option value="09:00">09:00</Option>
-                <Option value="10:00">10:00</Option>
+              <Select
+                placeholder="Time"
+                style={{ width: "100%" }}
+                value={rentalInfo.dropoffTime}
+                disabled={!rentalInfo.dropoffDate}
+                onChange={(value) =>
+                  setRentalInfo(prev => ({ ...prev, dropoffTime: value }))
+                }
+              >
+                {times.map((t) => (
+                  <Option key={t} value={t} disabled={disabledDropoffTime(t)}>
+                    {t}
+                  </Option>
+                ))}
               </Select>
             </Col>
           </Row>
         </Space>
       </Card>
 
-      {/* PAYMENT METHOD SECTION */}
+
+      {/* PAYMENT METHOD */}
       <Card>
         <Title level={4}>Payment Method</Title>
         <Text type="secondary">Please enter your payment method</Text>
@@ -127,7 +268,6 @@ const PaymentForm = () => {
         >
           <Space direction="vertical" size="large" style={{ width: "100%", marginTop: 20 }}>
 
-            {/* MoMo Option */}
             <Card>
               <Radio value="momo">
                 <WalletOutlined style={{ marginRight: 6 }} />
@@ -135,7 +275,6 @@ const PaymentForm = () => {
               </Radio>
             </Card>
 
-            {/* Bank Transfer Option */}
             <Card>
               <Radio value="bank_transfer">
                 <BankOutlined style={{ marginRight: 6 }} />
@@ -143,7 +282,6 @@ const PaymentForm = () => {
               </Radio>
             </Card>
 
-            {/* Cash Payment Option */}
             <Card>
               <Radio value="cash">
                 <DollarOutlined style={{ marginRight: 6 }} />
@@ -155,12 +293,10 @@ const PaymentForm = () => {
         </Radio.Group>
       </Card>
 
-      {/* CONFIRMATION SECTION */}
+
+      {/* CONFIRMATION */}
       <Card>
         <Title level={4}>Confirmation</Title>
-        <Text type="secondary">
-          We are getting to the end. Just few clicks and your rental is ready!
-        </Text>
 
         <Space direction="vertical" style={{ width: "100%", marginTop: 20 }}>
           <Checkbox>I agree with sending marketing emails</Checkbox>
@@ -183,7 +319,7 @@ const PaymentForm = () => {
             </Text>
             <br />
             <Text type="secondary">
-              We are using the most advanced security to provide you the best experience ever.
+              We use advanced security to protect your data.
             </Text>
           </div>
         </Space>

@@ -11,13 +11,17 @@ const CarDetailPage = () => {
     const location = useLocation();
 
     // lấy car từ navigate state (nếu có)
+    const rentalInfo = location.state?.rentalInfo || null;
+    
+    console.log("Rental info nhận tại CarDetail:", rentalInfo);
+
     const [car, setCar] = useState(location.state?.car || null);
     const [cars, setCars] = useState(location.state?.cars || []); // danh sách xe cũ để render “Recent Car”
     const [loading, setLoading] = useState(!car);
 
     // Load detail khi vào trực tiếp (F5)
     useEffect(() => {
-        if (car) return;
+        console.log("GO DETAIL:", car.CarId);
 
         const fetchCarDetail = async () => {
             setLoading(true);
@@ -29,7 +33,7 @@ const CarDetailPage = () => {
         };
 
         fetchCarDetail();
-    }, [car, carId]);
+    }, [carId]);
 
     // Nếu F5 mà không có list “recent cars”, thì load lại toàn bộ
     useEffect(() => {
@@ -63,13 +67,13 @@ const CarDetailPage = () => {
         >
             <div style={{ width: "100%", padding: 30 }}>
                 {/* PHẦN CHÍNH: HERO DETAIL */}
-                <CarDetailSection car={car} />
+                <CarDetailSection car={car} rentalInfo={rentalInfo} />
 
                 {/* Recommendation Cars */}
                 {/* Có thể tạo một danh sách khác nhau tùy bạn muốn */}
                 <div style={{ marginTop: 66, justifyItems: "center" }}>
                     <h3 style={{ fontWeight: "bold", marginBottom: -11 }}>Recommendation Cars</h3>
-                    <CarCard cars={cars} filters={{}} />
+                    <CarCard cars={cars.slice(0,3)} filters={{}} />
                 </div>
             </div>
         </div>

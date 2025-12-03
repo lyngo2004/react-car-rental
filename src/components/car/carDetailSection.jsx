@@ -10,11 +10,20 @@ import {
     Tag,
 } from "antd";
 import { HeartOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text, Paragraph } = Typography;
 
-const CarDetailSection = ({ car }) => {
+const CarDetailSection = ({ car, rentalInfo }) => {
     if (!car) return null;
+    const navigate = useNavigate();
+
+    const handleGoDetail = (car) => {
+        if (!car?.CarId) return;
+        navigate(`/payment}`, {
+            state: { car, rentalInfo },
+        });
+    };
 
     const fullName = `${car.Brand || ""} ${car.Model || ""}`.trim() || "Car Detail";
     const descriptionText =
@@ -67,9 +76,10 @@ const CarDetailSection = ({ car }) => {
                                 src={car.ImagePath}
                                 alt={fullName}
                                 style={{
-                                    maxWidth: "100%",
-                                    maxHeight: "100%",
+                                    maxWidth: "150%",
+                                    maxHeight: "150%",
                                     objectFit: "contain",
+                                    marginBottom: -35,
                                 }}
                             />
                         ) : (
@@ -179,7 +189,7 @@ const CarDetailSection = ({ car }) => {
                         <div>
                             <Title level={3} style={{ marginBottom: 0 }}>
                                 ${car.PricePerDay}/
-                                <span style={{ fontSize: 16 }}> days</span>
+                                <span style={{ fontSize: 16 }}>day</span>
                             </Title>
                             <Text delete type="secondary">
                                 ${Number(car.PricePerDay) + 20}.00
@@ -188,7 +198,7 @@ const CarDetailSection = ({ car }) => {
 
                         <Space>
                             <Tag color="blue">Available</Tag>
-                            <Button type="primary" size="large">
+                            <Button type="primary" size="large" onClick={() => handleGoDetail(car)}>
                                 Rent Now
                             </Button>
                         </Space>
