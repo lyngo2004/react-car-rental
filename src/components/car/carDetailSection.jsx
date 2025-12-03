@@ -20,7 +20,7 @@ const CarDetailSection = ({ car, rentalInfo }) => {
 
     const handleGoDetail = (car) => {
         if (!car?.CarId) return;
-        navigate(`/payment}`, {
+        navigate(`/payment`, {
             state: { car, rentalInfo },
         });
     };

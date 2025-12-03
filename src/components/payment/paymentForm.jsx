@@ -19,14 +19,31 @@ dayjs.extend(isSameOrBefore);
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-const PaymentForm = ({ rentalInfo, setRentalInfo }) => {
+const PaymentForm = ({ rentalInfo, setRentalInfo, customer, car }) => {
 
   const [locations, setLocations] = useState([]);
   const [times, setTimes] = useState([]);
   const [loadingLocations, setLoadingLocations] = useState(false);
   const [loadingTimes, setLoadingTimes] = useState(false);
+  const [billing, setBilling] = useState({
+    fullName: "",
+    phone: "",
+    address: "",
+    city: "",
+  });
 
   const [method, setMethod] = useState("momo");
+
+  useEffect(() => {
+    if (!customer) return;
+
+    setBilling(prev => ({
+      ...prev,
+      fullName: customer.FullName || "",
+      phone: customer.Phone || "",
+      address: customer.Address || "",
+    }));
+  }, [customer]);
 
   // FETCH LOCATIONS + TIMES
   useEffect(() => {
@@ -51,6 +68,8 @@ const PaymentForm = ({ rentalInfo, setRentalInfo }) => {
 
   // RESET dropoff when pickup changes
   useEffect(() => {
+    if (!rentalInfo) return;
+
     if (!rentalInfo.pickupDate || !rentalInfo.pickupTime) return;
 
     if (!rentalInfo._lastPickup) {
@@ -98,7 +117,9 @@ const PaymentForm = ({ rentalInfo, setRentalInfo }) => {
   // -------------------------------
   // DISABLED drop-off time (same day)
   // -------------------------------
+
   const sameDay =
+    rentalInfo &&
     rentalInfo.dropoffDate &&
     rentalInfo.pickupDate &&
     rentalInfo.dropoffDate.format("YYYY-MM-DD") === rentalInfo.pickupDate.format("YYYY-MM-DD");
