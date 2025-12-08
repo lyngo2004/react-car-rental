@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Row, Col, message, notification } from "antd";
+import { Row, Col, message, notification, Modal } from "antd";
 import dayjs from "dayjs";
+import carApi from "../utils/carApi";
 import userApi from "../utils/userApi";
 import rentalApi from "../utils/rentalApi";
 
@@ -77,7 +78,55 @@ const PaymentPage = () => {
     if (car === null) navigate("/car");
   }, [car]);
 
-  const handleCheckout = async () => {
+  // AUTO-CHECK CAR AVAILABILITY
+  const [carAvailable, setCarAvailable] = useState(true);
+
+  useEffect(() => {
+    const checkAvailability = async () => {
+      if (
+        !car ||
+        !rentalInfo.pickupLocation ||
+        !rentalInfo.pickupDate ||
+        !rentalInfo.pickupTime ||
+        !rentalInfo.dropoffLocation ||
+        !rentalInfo.dropoffDate ||
+        !rentalInfo.dropoffTime
+      )
+        return;
+
+      const payload = {
+        pickupLocation: rentalInfo.pickupLocation,
+        pickupDate: rentalInfo.pickupDate.format("YYYY-MM-DD"),
+        pickupTime: rentalInfo.pickupTime,
+        dropoffLocation: rentalInfo.dropoffLocation,
+        dropoffDate: rentalInfo.dropoffDate.format("YYYY-MM-DD"),
+        dropoffTime: rentalInfo.dropoffTime,
+      };
+
+      const res = await carApi.getAvailableCars(payload);
+
+      if (res?.EC === 0) {
+        const isAvailable = res.DT.some((c) => c.CarId === car.CarId);
+        setCarAvailable(isAvailable);
+      }
+    };
+
+    checkAvailability();
+  }, [rentalInfo, car]);
+
+  // Notify if car becomes unavailable
+  useEffect(() => {
+    if (carAvailable === false) {
+      notification.error({
+        message: "Car Not Available",
+        description: "This car is not available for the selected time.",
+        duration: 4
+      });
+    }
+  }, [carAvailable]);
+
+  // ---- Handle Checkout ----
+  const handlePreCheckout = async () => {
     if (!rentalInfo || !car) {
       notification.error({
         message: "Checkout Error",
@@ -110,6 +159,17 @@ const PaymentPage = () => {
       return;
     }
 
+    Modal.confirm({
+      title: "Confirm Rental",
+      content: "Are you sure you want to submit this rental request?",
+      okText: "Yes",
+      cancelText: "No",
+      onOk: () => handleCheckout(),    // only call real checkout when user confirms
+    });
+  };
+
+  // ---- Actual Checkout Function ----
+  const handleCheckout = async () => {
     const payload = {
       CarId: car.CarId,
       pickupLocation: rentalInfo.pickupLocation,
@@ -128,13 +188,15 @@ const PaymentPage = () => {
     if (res?.EC === 0) {
       notification.success({
         message: "Checkout Successful",
-        description: res.EM || "Your rental has been created successfully.",
-        placement: "center",
-        duration: 8,
+        description: "Your rental has been created successfully. Our team will review your request shortly.",
+        duration: 10,
       });
 
-      setCheckoutCompleted(true);   // ẩn UI
-      navigate("/car");
+      setTimeout(() => {
+        setCheckoutCompleted(true);   // ẩn UI
+        navigate("/car");
+      }, 1000);
+
     } else {
       message.error(res?.EM || "Checkout failed.");
     }
@@ -146,6 +208,7 @@ const PaymentPage = () => {
     <>
       {!checkoutCompleted ? (
         <div style={{ padding: "40px 80px", background: "#F6F7F9" }}>
+
           <Row gutter={32}>
             <Col xs={24} lg={16}>
               <PaymentForm
@@ -161,7 +224,8 @@ const PaymentPage = () => {
                 setConfirm2={setConfirm2}
                 customer={customer}
                 car={car}
-                onCheckout={handleCheckout}
+                carAvailable={carAvailable}
+                onCheckout={handlePreCheckout}
               />
             </Col>
 
