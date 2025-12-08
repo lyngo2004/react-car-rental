@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   Card, Row, Col, Select, DatePicker, Radio, Space, Typography,
-  Input, Button, Checkbox
+  Input, Button, Checkbox, Modal
 } from "antd";
 
 import {
@@ -19,8 +19,8 @@ dayjs.extend(isSameOrBefore);
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-const PaymentForm = ({ rentalInfo, setRentalInfo, billing, setBilling, paymentMethod, 
-  setPaymentMethod, confirm1, setConfirm1, confirm2, setConfirm2, customer, car, onCheckout }) => {
+const PaymentForm = ({ rentalInfo, setRentalInfo, billing, setBilling, paymentMethod,
+  setPaymentMethod, confirm1, setConfirm1, confirm2, setConfirm2, customer, car, carAvailable, onCheckout }) => {
 
   const [locations, setLocations] = useState([]);
   const [times, setTimes] = useState([]);
@@ -106,10 +106,7 @@ const PaymentForm = ({ rentalInfo, setRentalInfo, billing, setBilling, paymentMe
     return current && current < rentalInfo.pickupDate.startOf("day");
   };
 
-  // -------------------------------
   // DISABLED drop-off time (same day)
-  // -------------------------------
-
   const sameDay =
     rentalInfo &&
     rentalInfo.dropoffDate &&
@@ -345,6 +342,7 @@ const PaymentForm = ({ rentalInfo, setRentalInfo, billing, setBilling, paymentMe
             type="primary"
             size="large"
             block
+            disabled={!carAvailable}
             onClick={onCheckout}
             style={{ backgroundColor: "#3563E9" }}
           >
