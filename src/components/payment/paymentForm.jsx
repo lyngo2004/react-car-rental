@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   Card, Row, Col, Select, DatePicker, Radio, Space, Typography,
-  Input, Button, Checkbox
+  Input, Button, Checkbox, Modal
 } from "antd";
 
 import {
@@ -19,14 +19,23 @@ dayjs.extend(isSameOrBefore);
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-const PaymentForm = ({ rentalInfo, setRentalInfo }) => {
+const PaymentForm = ({ rentalInfo, setRentalInfo, billing, setBilling, paymentMethod,
+  setPaymentMethod, confirm1, setConfirm1, confirm2, setConfirm2, customer, car, carAvailable, onCheckout }) => {
 
   const [locations, setLocations] = useState([]);
   const [times, setTimes] = useState([]);
   const [loadingLocations, setLoadingLocations] = useState(false);
   const [loadingTimes, setLoadingTimes] = useState(false);
-
-  const [method, setMethod] = useState("momo");
+  useEffect(() => {
+    if (!customer) return;
+    setBilling(prev => ({
+      ...prev,
+      fullName: customer.FullName ?? "",
+      phone: customer.Phone ?? "",
+      address: customer.Address ?? "",
+      driverLicense: customer.DriverLicense ?? "",
+    }));
+  }, [customer]);
 
   // FETCH LOCATIONS + TIMES
   useEffect(() => {
@@ -51,6 +60,8 @@ const PaymentForm = ({ rentalInfo, setRentalInfo }) => {
 
   // RESET dropoff when pickup changes
   useEffect(() => {
+    if (!rentalInfo) return;
+
     if (!rentalInfo.pickupDate || !rentalInfo.pickupTime) return;
 
     if (!rentalInfo._lastPickup) {
@@ -95,10 +106,9 @@ const PaymentForm = ({ rentalInfo, setRentalInfo }) => {
     return current && current < rentalInfo.pickupDate.startOf("day");
   };
 
-  // -------------------------------
   // DISABLED drop-off time (same day)
-  // -------------------------------
   const sameDay =
+    rentalInfo &&
     rentalInfo.dropoffDate &&
     rentalInfo.pickupDate &&
     rentalInfo.dropoffDate.format("YYYY-MM-DD") === rentalInfo.pickupDate.format("YYYY-MM-DD");
@@ -115,10 +125,6 @@ const PaymentForm = ({ rentalInfo, setRentalInfo }) => {
     return false;
   };
 
-  const handleRentNow = () => {
-    console.log("SUBMIT RENT: ", rentalInfo);
-  };
-
   return (
     <Space direction="vertical" size="large" style={{ width: "100%" }}>
 
@@ -128,15 +134,40 @@ const PaymentForm = ({ rentalInfo, setRentalInfo }) => {
         <Text type="secondary">Please enter your billing info</Text>
 
         <Row gutter={20} style={{ marginTop: 20 }}>
-          <Col span={12}><Input placeholder="Your name" /></Col>
-          <Col span={12}><Input placeholder="Phone number" /></Col>
-
-          <Col span={12} style={{ marginTop: 16 }}>
-            <Input placeholder="Address" />
+          <Col span={12}>
+            <Input placeholder="Your name"
+              value={billing.fullName}
+              onChange={(e) => setBilling(prev => ({ ...prev, fullName: e.target.value }))
+              } />
+          </Col>
+          <Col span={12}>
+            <Input
+              placeholder="Phone number"
+              value={billing.phone}
+              onChange={(e) =>
+                setBilling(prev => ({ ...prev, phone: e.target.value }))
+              }
+            />
           </Col>
 
           <Col span={12} style={{ marginTop: 16 }}>
-            <Input placeholder="Town / City" />
+            <Input
+              placeholder="Address"
+              value={billing.address}
+              onChange={(e) =>
+                setBilling(prev => ({ ...prev, address: e.target.value }))
+              }
+            />
+          </Col>
+
+          <Col span={12} style={{ marginTop: 16 }}>
+            <Input
+              placeholder="Driver License"
+              value={billing.driverLicense}
+              onChange={(e) =>
+                setBilling(prev => ({ ...prev, driverLicense: e.target.value }))
+              }
+            />
           </Col>
         </Row>
       </Card>
@@ -262,16 +293,16 @@ const PaymentForm = ({ rentalInfo, setRentalInfo }) => {
         <Text type="secondary">Please enter your payment method</Text>
 
         <Radio.Group
-          onChange={(e) => setMethod(e.target.value)}
-          value={method}
+          value={paymentMethod}
+          onChange={(e) => setPaymentMethod(e.target.value)}
           style={{ width: "100%" }}
         >
           <Space direction="vertical" size="large" style={{ width: "100%", marginTop: 20 }}>
 
             <Card>
-              <Radio value="momo">
+              <Radio value="apple_pay">
                 <WalletOutlined style={{ marginRight: 6 }} />
-                Momo Wallet
+                Apple Pay
               </Radio>
             </Card>
 
@@ -283,9 +314,9 @@ const PaymentForm = ({ rentalInfo, setRentalInfo }) => {
             </Card>
 
             <Card>
-              <Radio value="cash">
+              <Radio value="credit-debit-card">
                 <DollarOutlined style={{ marginRight: 6 }} />
-                Cash on Delivery
+                Credit/Debit Card
               </Radio>
             </Card>
 
@@ -299,14 +330,20 @@ const PaymentForm = ({ rentalInfo, setRentalInfo }) => {
         <Title level={4}>Confirmation</Title>
 
         <Space direction="vertical" style={{ width: "100%", marginTop: 20 }}>
-          <Checkbox>I agree with sending marketing emails</Checkbox>
-          <Checkbox>I agree with the terms and conditions</Checkbox>
+          <Checkbox checked={confirm1} onChange={(e) => setConfirm1(e.target.checked)}>
+            I agree with sending marketing emails
+          </Checkbox>
+
+          <Checkbox checked={confirm2} onChange={(e) => setConfirm2(e.target.checked)}>
+            I agree with the terms and conditions
+          </Checkbox>
 
           <Button
             type="primary"
             size="large"
             block
-            onClick={handleRentNow}
+            disabled={!carAvailable}
+            onClick={onCheckout}
             style={{ backgroundColor: "#3563E9" }}
           >
             Rent Now
