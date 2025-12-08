@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 const { Title, Text } = Typography;
 
 const RentalSummary = ({ car, rentalInfo }) => {
+  
   const { pickupDate, pickupTime, dropoffDate, dropoffTime } = rentalInfo;
 
   let rentalDays = 1;
