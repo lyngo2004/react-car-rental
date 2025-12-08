@@ -170,8 +170,8 @@ const HomePage = () => {
 
         <Col span={6} style={{ textAlign: "center" }}>
           <TeamOutlined style={{ fontSize: 40 }} />
-          <Title level={4}>We know travel</Title>
-          <Text>10 years of experience finding perfect cars.</Text>
+          <Title level={4}>Smart policies</Title>
+          <Text>Clear rental terms and fair pricing.</Text>
         </Col>
       </Row>
 
