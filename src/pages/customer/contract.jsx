@@ -1,11 +1,11 @@
 import { useParams } from "react-router-dom";
 import { Row, Col, Spin, Alert } from "antd";
 import { useEffect, useState } from "react";
-import rentalApi from "../utils/rentalApi";
+import rentalApi from "../../utils/customer/rentalApi";
 
-import ContractHeader from "../components/contract/contractHeader";
-import ContractMainInfo from "../components/contract/contractMainInfo";
-import ContractSummary from "../components/contract/contractSummary";
+import ContractHeader from "../../components/contract/contractHeader";
+import ContractMainInfo from "../../components/contract/contractMainInfo";
+import ContractSummary from "../../components/contract/contractSummary";
 
 const ContractPage = () => {
     const { id } = useParams();

@@ -1,5 +1,5 @@
 // src/utils/rentalApi.js
-import axios from "./axios.customize";
+import axios from "../axios.customize";
 
 const rentalApi = {
     async createRental(rentalData) {

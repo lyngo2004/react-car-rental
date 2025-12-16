@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
-import carApi from "../utils/carApi";
-import FilterSideBar from "../components/car/filterSideBar";
-import CarCard from "../components/car/carCard";
-import FilterBar from "../components/car/filterBar";
+import carApi from "../../utils/customer/carApi";
+import FilterSideBar from "../../components/car/filterSideBar";
+import CarCard from "../../components/car/carCard";
+import FilterBar from "../../components/car/filterBar";
 
 const CarPage = () => {
     const [cars, setCars] = useState([]);
