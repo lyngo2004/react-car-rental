@@ -186,6 +186,8 @@ const PaymentPage = () => {
     const res = await rentalApi.createRental(payload);
 
     if (res?.EC === 0) {
+      const rentalId = res.DT.RentalId;
+
       notification.success({
         message: "Checkout Successful",
         description: "Your rental has been created successfully. Our team will review your request shortly.",
@@ -194,7 +196,7 @@ const PaymentPage = () => {
 
       setTimeout(() => {
         setCheckoutCompleted(true);   // ẩn UI
-        navigate("/car");
+        navigate(`/contract/${rentalId}`);
       }, 1000);
 
     } else {

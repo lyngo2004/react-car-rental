@@ -11,6 +11,16 @@ const rentalApi = {
             return null;
         }
     },
+
+    async getRentalById(id) {
+        try {
+            const res = await axios.get(`/api/v1/rental/${id}`);
+            return res;
+        } catch (error) {
+            console.error("rentalApi.createRental error:", error.response?.data || error);
+            return null;
+        }
+    }
 };
 
 export default rentalApi;

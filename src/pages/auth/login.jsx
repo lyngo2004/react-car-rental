@@ -2,7 +2,7 @@ import React from "react";
 import { Form, Input, Button, Checkbox, Typography, notification } from "antd";
 import { useNavigate } from "react-router-dom";
 import userApi from "../../utils/userApi";
-import "./auth.css"; // nhớ tạo file này
+import "./auth.css";
 
 const { Title } = Typography;
 

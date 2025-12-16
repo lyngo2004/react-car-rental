@@ -10,6 +10,7 @@ import PaymentPage from './pages/payment.jsx'
 import LoginPage from './pages/auth/login.jsx'
 import CarPage from './pages/car.jsx'
 import CarDetailPage from './pages/carDetail.jsx'
+import ContractPage from './pages/contract.jsx'
 import { Navigate } from 'react-router-dom'
 
 import {
@@ -43,10 +44,10 @@ let router = createBrowserRouter([
         path: "home",
         element: <HomePage />
       },
-      {
-        path: "user",
-        element: <UserPage />
-      },
+      // {
+      //   path: "user",
+      //   element: <UserPage />
+      // },
       {
         path: "car",
         element: <CarPage />
@@ -58,6 +59,10 @@ let router = createBrowserRouter([
       {
         path: "payment",
         element: <PaymentPage />
+      },
+      {
+        path: "contract/:id",
+        element: <ContractPage />
       }
     ]
   }
