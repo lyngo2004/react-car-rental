@@ -7,229 +7,344 @@ import {
   Upload,
   Row,
   Col,
-  DatePicker,
-  TimePicker,
   Typography,
+  Space,
+  Modal,
+  Image,
+  Divider,
+  notification,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
-const { Option } = Select;
+import carAdminApi from "../../../utils/admin/carApi";
+
 const { Title, Text } = Typography;
 
-const labelStyle = {
-  fontSize: 16,
-  fontWeight: 600,
-};
+const CAR_STATUS_OPTIONS = [
+  { label: "Active", value: "Active" },
+  { label: "Inactive", value: "Inactive" },
+];
 
-const AdminCarUpsert = ({ mode }) => {
-  const { id } = useParams();      // lấy từ URL
-  const isEdit = Boolean(id);   
+const labelStyle = { fontWeight: 600 };
+
+const AdminCarUpsert = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const isDetailMode = Boolean(id);
 
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(!isDetailMode);
+  const [car, setCar] = useState(null);
 
-  const onFinish = (values) => {
-    console.log(values);
-    // TODO: call create / update API
+  const isViewMode = isDetailMode && !isEditing;
+
+  /* ================= FETCH DETAIL ================= */
+  useEffect(() => {
+    if (!isDetailMode) return;
+
+    const fetchCar = async () => {
+      setLoading(true);
+      const res = await carAdminApi.getAdminCarById(id);
+      setLoading(false);
+
+      if (res?.EC === 0) {
+        setCar(res.DT);
+        form.setFieldsValue(res.DT);
+      } else {
+        notification.error({ message: "Failed to load car" });
+        navigate("/admin/cars");
+      }
+    };
+
+    fetchCar();
+  }, [id]);
+
+  /* ================= ACTIONS ================= */
+  const handleBack = () => navigate("/admin/cars");
+
+  const handleDelete = () => {
+    Modal.confirm({
+      title: "Delete this car?",
+      content: "This action cannot be undone.",
+      okText: "Delete",
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        setLoading(true);
+        const res = await carAdminApi.deleteAdminCar(id);
+        setLoading(false);
+
+        if (res?.EC === 0) {
+          notification.success({ message: "Car deleted" });
+          navigate("/admin/cars");
+        } else {
+          notification.error({ message: res?.EM || "Delete failed" });
+        }
+      },
+    });
   };
 
+  const handleCancelEdit = () => {
+    Modal.confirm({
+      title: "Discard changes?",
+      onOk: () => {
+        form.setFieldsValue(car);
+        setIsEditing(false);
+      },
+    });
+  };
+
+  /* ================= SUBMIT ================= */
+  const onFinish = async (values) => {
+    const formData = new FormData();
+
+    // append all normal fields
+    Object.keys(values).forEach((key) => {
+      if (key !== "image" && values[key] !== undefined && values[key] !== null) {
+        formData.append(key, values[key]);
+      }
+    });
+
+    // append file
+    const file = values.image?.[0]?.originFileObj;
+    if (file) {
+      formData.append("image", file); //  QUAN TRỌNG: key phải là "image"
+    }
+
+    setLoading(true);
+
+    const res = isDetailMode
+      ? await carAdminApi.updateAdminCar(id, formData)
+      : await carAdminApi.createAdminCar(formData);
+
+    setLoading(false);
+
+    if (res?.EC === 0) {
+      notification.success({
+        message: isDetailMode ? "Updated successfully" : "Created successfully",
+      });
+      navigate("/admin/cars");
+    } else {
+      notification.error({ message: res?.EM || "Operation failed" });
+    }
+  };
+
+  /* ================= RENDER ================= */
   return (
     <Card
+      loading={loading}
       title={
-        <Title level={4} style={{ margin: 0 }}>
-          Add/Edit Car
-        </Title>
+        <div>
+          <Title level={4} style={{ marginBottom: 0 }}>
+            {isDetailMode ? "Car Details" : "Add New Car"}
+          </Title>
+          <Text type="secondary">
+            {isViewMode
+              ? "View only. Click Edit to modify."
+              : "Fill in car information below."}
+          </Text>
+        </div>
       }
       extra={
-        <Text type="secondary" style={{ fontSize: 14 }}>
-          Please enter the car details below
-        </Text>
+        <Space>
+          <Button onClick={handleBack}>Back</Button>
+
+          {isViewMode && (
+            <>
+              <Button danger onClick={handleDelete}>
+                Delete
+              </Button>
+              <Button type="primary" onClick={() => setIsEditing(true)}>
+                Edit
+              </Button>
+            </>
+          )}
+
+          {!isViewMode && (
+            <>
+              <Button onClick={handleCancelEdit}>Cancel</Button>
+              <Button type="primary" htmlType="submit" form="car-form">
+                Save
+              </Button>
+            </>
+          )}
+        </Space>
       }
-      style={{ borderRadius: 16 }}
-      bodyStyle={{ padding: 32 }}
     >
       <Form
+        id="car-form"
         form={form}
         layout="vertical"
         onFinish={onFinish}
       >
-        <Row gutter={[24, 5]}>
-          {/* Car ID (Edit only) */}
-          {isEdit && (
+        {isDetailMode && (
+          <>
+            <Row gutter={24}>
+              <Col span={12}>
+                <Form.Item label="Car ID" name="CarId">
+                  <Input readOnly />
+                </Form.Item>
+              </Col>
+
+              <Col span={12}>
+                <Text style={labelStyle}>Current Image</Text>
+
+                <div
+                  style={{
+                    marginTop: 12,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    minHeight: 160, // tạo không gian thở
+                  }}
+                >
+                  {car?.ImagePath ? (
+                    <Image
+                      src={car.ImagePath}
+                      width={220}
+                      style={{ objectFit: "contain" }}
+                    />
+                  ) : (
+                    <Text type="secondary">No image</Text>
+                  )}
+                </div>
+              </Col>
+            </Row>
+            <Divider />
+          </>
+        )}
+
+        <Row gutter={24}>
+          <Col span={12}>
+            <Form.Item
+              label="License Plate"
+              name="LicensePlate"
+              rules={[{ required: true }]}
+            >
+              <Input readOnly={isViewMode} />
+            </Form.Item>
+          </Col>
+
+          <Col span={12}>
+            <Form.Item label="Brand" name="Brand" rules={[{ required: true }]}>
+              <Input readOnly={isViewMode} />
+            </Form.Item>
+          </Col>
+
+          <Col span={12}>
+            <Form.Item label="Model" name="Model" rules={[{ required: true }]}>
+              <Input readOnly={isViewMode} />
+            </Form.Item>
+          </Col>
+
+          <Col span={12}>
+            <Form.Item label="Car Type" name="CarType" rules={[{ required: true }]}>
+              <Input readOnly={isViewMode} />
+            </Form.Item>
+          </Col>
+
+          <Col span={24}>
+            <Form.Item
+              label="Description"
+              name="Description"
+            >
+              <Input.TextArea
+                rows={4}
+                readOnly={isViewMode}
+                placeholder={isViewMode ? "" : "Additional information about the car"}
+              />
+            </Form.Item>
+          </Col>
+
+
+          <Col span={12}>
+            <Form.Item
+              label="Color"
+              name="Color"
+              rules={[{ required: true }]}
+            >
+              <Input readOnly={isViewMode} />
+            </Form.Item>
+          </Col>
+
+          <Col span={12}>
+            <Form.Item
+              label="Manufacture Year"
+              name="ManufactureYear"
+              rules={[
+                { required: true },
+                {
+                  validator: (_, v) =>
+                    !v || (v >= 1990 && v <= new Date().getFullYear())
+                      ? Promise.resolve()
+                      : Promise.reject(new Error("Invalid manufacture year")),
+                },
+              ]}
+            >
+              <Input type="number" readOnly={isViewMode} />
+            </Form.Item>
+          </Col>
+
+          <Col span={12}>
+            <Form.Item label="Capacity" name="Capacity" rules={[{ required: true }]}>
+              <Input type="number" readOnly={isViewMode} />
+            </Form.Item>
+          </Col>
+
+          <Col span={12}>
+            <Form.Item
+              label="Mileage (km)"
+              name="Mileage"
+              rules={[{ required: true }]}
+            >
+              <Input type="number" readOnly={isViewMode} />
+            </Form.Item>
+          </Col>
+
+          <Col span={12}>
+            <Form.Item
+              label="Price Per Day"
+              name="PricePerDay"
+              rules={[{ required: true }]}
+            >
+              <Input type="number" readOnly={isViewMode} />
+            </Form.Item>
+          </Col>
+
+          <Col span={12}>
+            <Form.Item label="Car Status" name="CarStatus">
+              {isViewMode ? (
+                <Input readOnly />
+              ) : (
+                <Select options={CAR_STATUS_OPTIONS} />
+              )}
+            </Form.Item>
+          </Col>
+
+          {!isViewMode && (
             <Col span={12}>
               <Form.Item
-                label={<Text style={labelStyle}>Car ID</Text>}
-                name="carId"
+                label="Replace Image"
+                name="image"
+                valuePropName="fileList"
+                getValueFromEvent={(e) => {
+                  if (Array.isArray(e)) return e;
+                  return e?.fileList;
+                }}
               >
-                <Input disabled />
+                <Upload
+                  beforeUpload={() => false}
+                  maxCount={1}
+                  listType="picture"
+                >
+                  <Button>Upload Image</Button>
+                </Upload>
               </Form.Item>
             </Col>
           )}
-
-          {/* Brand */}
-          <Col span={12}>
-            <Form.Item
-              label={<Text style={labelStyle}>Brand</Text>}
-              name="brand"
-              rules={[{ required: true, message: "Brand is required" }]}
-            >
-              <Input placeholder="Brand" />
-            </Form.Item>
-          </Col>
-
-          {/* Model */}
-          <Col span={12}>
-            <Form.Item
-              label={<Text style={labelStyle}>Model</Text>}
-              name="model"
-              rules={[{ required: true, message: "Model is required" }]}
-            >
-              <Input placeholder="Model" />
-            </Form.Item>
-          </Col>
-
-          {/* Car Type */}
-          <Col span={12}>
-            <Form.Item
-              label={<Text style={labelStyle}>Car Type</Text>}
-              name="carType"
-              rules={[{ required: true, message: "Car type is required" }]}
-            >
-              <Select placeholder="Car Type">
-                <Option value="sedan">Sedan</Option>
-                <Option value="suv">SUV</Option>
-                <Option value="hatchback">Hatchback</Option>
-                <Option value="crossover">Crossover</Option>
-                <Option value="convertible">Convertible</Option>
-                <Option value="coupe">Coupe</Option>
-                <Option value="minivan">Minivan</Option>
-                <Option value="pickup">Pickup Truck</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-
-          {/* Manufacture Year */}
-          <Col span={12}>
-            <Form.Item
-              label={<Text style={labelStyle}>Manufacture Year</Text>}
-              name="manufactureYear"
-            >
-              <Input placeholder="e.g. 2021" />
-            </Form.Item>
-          </Col>
-
-          {/* Car Status */}
-          <Col span={12}>
-            <Form.Item
-              label={<Text style={labelStyle}>Car Status</Text>}
-              name="carStatus"
-            >
-              <Select placeholder="Status">
-                <Option value="available">Available</Option>
-                <Option value="rented">Rented</Option>
-                <Option value="maintenance">Maintenance</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-
-          {/* Price */}
-          <Col span={12}>
-            <Form.Item
-              label={<Text style={labelStyle}>Price Per Day</Text>}
-              name="pricePerDay"
-              rules={[{ required: true, message: "Price is required" }]}
-            >
-              <Input prefix="$" placeholder="Price" />
-            </Form.Item>
-          </Col>
-
-          {/* Mileage */}
-          <Col span={12}>
-            <Form.Item
-              label={<Text style={labelStyle}>Mileage</Text>}
-              name="mileage"
-            >
-              <Input placeholder="km" />
-            </Form.Item>
-          </Col>
-
-          {/* Capacity */}
-          <Col span={12}>
-            <Form.Item
-              label={<Text style={labelStyle}>Capacity</Text>}
-              name="capacity"
-            >
-              <Input placeholder="Seats" />
-            </Form.Item>
-          </Col>
-
-          {/* Color */}
-          <Col span={12}>
-            <Form.Item
-              label={<Text style={labelStyle}>Color</Text>}
-              name="color"
-            >
-              <Input placeholder="Color" />
-            </Form.Item>
-          </Col>
-
-          {/* License Plate */}
-          <Col span={12}>
-            <Form.Item
-              label={<Text style={labelStyle}>License Plate</Text>}
-              name="licensePlate"
-              rules={[{ required: true, message: "License plate is required" }]}
-            >
-              <Input placeholder="License Plate" />
-            </Form.Item>
-          </Col>
-
-          {/* Description */}
-          <Col span={12}>
-            <Form.Item
-              label={<Text style={labelStyle}>Description</Text>}
-              name="description"
-            >
-              <Input.TextArea rows={2} placeholder="Description" />
-            </Form.Item>
-          </Col>
-
-          {/* Image Upload */}
-          <Col span={24}>
-            <Form.Item label={<Text style={labelStyle}>Car Image</Text>}>
-              <Upload.Dragger multiple={false} beforeUpload={() => false}>
-                <p className="ant-upload-drag-icon">
-                  <UploadOutlined />
-                </p>
-                <p><Text strong>Drag & drop</Text> or click to upload</p>
-                <p className="ant-upload-hint">
-                  Supports JPG, PNG (Max 5MB)
-                </p>
-              </Upload.Dragger>
-            </Form.Item>
-          </Col>
-
         </Row>
-
-
-        {/* Actions */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: 12,
-            marginTop: 24,
-          }}
-        >
-          
-          <Button danger disabled={!isEdit}>
-            Delete
-          </Button>
-          
-          <Button type="primary" htmlType="submit">
-            Save
-          </Button>
-        </div>
       </Form>
     </Card>
   );

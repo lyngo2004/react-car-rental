@@ -10,6 +10,9 @@ import './styles/global.css'
 import RegisterPage from './pages/auth/register.jsx'
 import LoginPage from './pages/auth/login.jsx'
 
+import AdminRoute from "./components/layout/adminRoute";
+import CustomerRoute from "./components/layout/customerRoute";
+
 // Customer pages
 import UserPage from './pages/user.jsx'
 import HomePage from './pages/home.jsx'
@@ -22,6 +25,8 @@ import ContractPage from './pages/customer/contract.jsx'
 import AdminLayoutPage from "./components/layout/adminLayout";
 import AdminCarListPage from "./pages/admin/cars/adminCarList";
 import AdminCarUpsertPage from "./pages/admin/cars/adminCarUpsert";
+import AdminRentalList from './pages/admin/rentals/adminRentalList.jsx';
+import AdminContractPage from './pages/admin/rentals/adminContractPage.jsx'
 
 // Router
 import {
@@ -50,52 +55,34 @@ let router = createBrowserRouter([
   // Customer layout
   {
     path: "/",
-    element: <App />,
+    element: (
+      <CustomerRoute>
+        <App />
+      </CustomerRoute>
+    ),
     children: [
-      {
-        path: "home",
-        element: <HomePage />
-      },
-      // {
-      //   path: "user",
-      //   element: <UserPage />
-      // },
-      {
-        path: "car",
-        element: <CarPage />
-      },
-      {
-        path: "car/:carId",
-        element: <CarDetailPage />
-      },
-      {
-        path: "payment",
-        element: <PaymentPage />
-      },
-      {
-        path: "contract/:id",
-        element: <ContractPage />
-      }
-    ]
+      { path: "home", element: <HomePage /> },
+      { path: "car", element: <CarPage /> },
+      { path: "car/:carId", element: <CarDetailPage /> },
+      { path: "payment", element: <PaymentPage /> },
+      { path: "contract/:id", element: <ContractPage /> },
+    ],
   },
 
   // Admin layout
   {
     path: "/admin",
-    element: <AdminLayoutPage />,
+    element: (
+      <AdminRoute>
+        <AdminLayoutPage />
+      </AdminRoute>
+    ),
     children: [
-      {
-        path: "cars",
-        element: <AdminCarListPage />,
-      },
-      {
-        path: "cars/new",
-        element: <AdminCarUpsertPage mode="create" />,
-      },
-      {
-        path: "cars/:id",
-        element: <AdminCarUpsertPage mode="edit" />,
-      },
+      { path: "cars", element: <AdminCarListPage /> },
+      { path: "cars/new", element: <AdminCarUpsertPage mode="create" /> },
+      { path: "cars/:id", element: <AdminCarUpsertPage mode="edit" /> },
+      { path: "rentals", element: <AdminRentalList /> },
+      { path: "rentals/:id", element: <AdminContractPage />}
     ],
   },
 ]);

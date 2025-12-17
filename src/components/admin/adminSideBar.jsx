@@ -1,4 +1,5 @@
-import { Menu } from "antd";
+import { Layout, Menu } from "antd";
+
 import {
   DashboardOutlined,
   ShoppingCartOutlined,
@@ -10,6 +11,8 @@ import {
   LogoutOutlined,
 } from "@ant-design/icons";
 import { useNavigate, useLocation, replace } from "react-router-dom";
+
+const { Sider } = Layout;
 
 const AdminSideBar = () => {
   const navigate = useNavigate();
@@ -26,11 +29,13 @@ const AdminSideBar = () => {
   ];
 
   return (
-    <>
-      <div style={{ padding: 24, fontSize: 24, fontWeight: 700, color: "#3563e9" }}>
-        MORENT
-      </div>
-
+    <Sider
+      width={240}
+      style={{
+        background: "#fff",
+        borderRight: "1px solid #f0f0f0",
+      }}
+    >
       <Menu
         mode="inline"
         selectedKeys={[location.pathname]}
@@ -54,7 +59,7 @@ const AdminSideBar = () => {
           ]}
         />
       </div>
-    </>
+    </Sider>
   );
 };
 
