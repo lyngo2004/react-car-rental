@@ -4,12 +4,13 @@ import App from './App.jsx'
 import 'antd/dist/reset.css'
 import './styles/global.css'
 import RegisterPage from './pages/auth/register.jsx'
+import LoginPage from './pages/auth/login.jsx'
 import UserPage from './pages/user.jsx'
 import HomePage from './pages/home.jsx'
-import PaymentPage from './pages/payment.jsx'
-import LoginPage from './pages/auth/login.jsx'
-import CarPage from './pages/car.jsx'
-import CarDetailPage from './pages/carDetail.jsx'
+import PaymentPage from './pages/customer/payment.jsx'
+import CarPage from './pages/customer/car.jsx'
+import CarDetailPage from './pages/customer/carDetail.jsx'
+import ContractPage from './pages/customer/contract.jsx'
 import { Navigate } from 'react-router-dom'
 
 import {
@@ -43,10 +44,10 @@ let router = createBrowserRouter([
         path: "home",
         element: <HomePage />
       },
-      {
-        path: "user",
-        element: <UserPage />
-      },
+      // {
+      //   path: "user",
+      //   element: <UserPage />
+      // },
       {
         path: "car",
         element: <CarPage />
@@ -58,6 +59,10 @@ let router = createBrowserRouter([
       {
         path: "payment",
         element: <PaymentPage />
+      },
+      {
+        path: "contract/:id",
+        element: <ContractPage />
       }
     ]
   }

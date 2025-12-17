@@ -6,7 +6,7 @@ import {
   TeamOutlined,
 } from "@ant-design/icons";
 
-import carApi from "../utils/carApi";
+import carApi from "../utils/customer/carApi";
 
 // Images
 import CarHero1 from "../assets/images/homepage/car1.png";
@@ -30,7 +30,7 @@ const HomePage = () => {
 
   return (
     <div style={{ width: "90%", margin: "0 auto" }}>
-      
+
       {/* ================ HERO SECTION ================ */}
       <Row gutter={24} style={{ marginTop: 40 }}>
         <Col span={12}>

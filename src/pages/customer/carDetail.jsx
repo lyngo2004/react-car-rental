@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { Skeleton } from "antd";
 
-import carApi from "../utils/carApi";
-import CarDetailSection from "../components/car/carDetailSection";
-import CarCard from "../components/car/carCard";
+import carApi from "../../utils/customer/carApi";
+import CarDetailSection from "../../components/car/carDetailSection";
+import CarCard from "../../components/car/carCard";
 
 const CarDetailPage = () => {
     const { carId } = useParams();

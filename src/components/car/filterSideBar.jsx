@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Checkbox, Slider, Typography, Spin } from "antd";
-import carApi from "../../utils/carApi";
+import carApi from "../../utils/customer/carApi";
 import { normalizeApiResponse } from "../../utils/apiUtils";
 
 const { Title, Text } = Typography;
