@@ -32,7 +32,9 @@ const LoginPage = () => {
 
     return (
         <div className="login-container">
-            <div className="login-left" />
+            <div className="login-left"
+                 style={{ backgroundImage: "url(/carbg.jpg)" }} 
+            />
 
             <div className="login-right">
                 <div className="login-header">
