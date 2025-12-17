@@ -25,6 +25,8 @@ import ContractPage from './pages/customer/contract.jsx'
 import AdminLayoutPage from "./components/layout/adminLayout";
 import AdminCarListPage from "./pages/admin/cars/adminCarList";
 import AdminCarUpsertPage from "./pages/admin/cars/adminCarUpsert";
+import AdminRentalList from './pages/admin/rentals/adminRentalList.jsx';
+import AdminContractPage from './pages/admin/rentals/adminContractPage.jsx'
 
 // Router
 import {
@@ -79,6 +81,8 @@ let router = createBrowserRouter([
       { path: "cars", element: <AdminCarListPage /> },
       { path: "cars/new", element: <AdminCarUpsertPage mode="create" /> },
       { path: "cars/:id", element: <AdminCarUpsertPage mode="edit" /> },
+      { path: "rentals", element: <AdminRentalList /> },
+      { path: "rentals/:id", element: <AdminContractPage />}
     ],
   },
 ]);

@@ -1,43 +1,114 @@
 import instance from "../axios.customize";
 
-const ADMIN_RENTAL_BASE = "/api/v1/admin/rental";
-
 const rentalAdminApi = {
-  /* ================= LIST ================= */
+    /* ================= LIST ================= */
 
-  // GET /api/v1/admin/rental
-  getAllRentals() {
-    return instance.get(ADMIN_RENTAL_BASE);
-  },
+    // GET /api/v1/admin/rental
+    async getAllAdminRentals() {
+        try {
+            const res = await instance.get("/api/v1/admin/rental");
+            return res;
+        } catch (error) {
+            console.error(
+                "getAllAdminRentals error:",
+                error.response?.data || error
+            );
+            return null;
+        }
+    },
 
-  // GET /api/v1/admin/rental/summary
-  getRentalSummary() {
-    return instance.get(`${ADMIN_RENTAL_BASE}/summary`);
-  },
+    async getAdminRentalsByStatus(status) {
+        try {
+            const res = await instance.get(`/api/v1/admin/rental/status/${status}`);
+            return res;
+        } catch (error) {
+            console.error("getAdminRentalsByStatus error:", error);
+            return null;
+        }
+    },
+    /* ================= SUMMARY ================= */
 
-  /* ================= DETAIL ================= */
+    // GET /api/v1/admin/rental/summary
+    async getAdminRentalSummary() {
+        try {
+            const res = await instance.get("/api/v1/admin/rental/summary");
+            return res;
+        } catch (error) {
+            console.error(
+                "getAdminRentalSummary error:",
+                error.response?.data || error
+            );
+            return null;
+        }
+    },
 
-  // GET /api/v1/admin/rental/:id
-  getRentalById(rentalId) {
-    return instance.get(`${ADMIN_RENTAL_BASE}/${rentalId}`);
-  },
+    /* ================= DETAIL ================= */
 
-  /* ================= ACTIONS ================= */
+    // GET /api/v1/admin/rental/:id
+    async getAdminRentalById(rentalId) {
+        try {
+            const res = await instance.get(
+                `/api/v1/admin/rental/${rentalId}`
+            );
+            return res;
+        } catch (error) {
+            console.error(
+                "getAdminRentalById error:",
+                error.response?.data || error
+            );
+            return null;
+        }
+    },
 
-  // PATCH /api/v1/admin/rental/:id/approve
-  approveRental(rentalId) {
-    return instance.patch(`${ADMIN_RENTAL_BASE}/${rentalId}/approve`);
-  },
+    /* ================= ACTIONS ================= */
 
-  // PATCH /api/v1/admin/rental/:id/reject
-  rejectRental(rentalId) {
-    return instance.patch(`${ADMIN_RENTAL_BASE}/${rentalId}/reject`);
-  },
+    // PATCH /api/v1/admin/rental/:id/approve
+    async approveRental(rentalId) {
+        try {
+            const res = await instance.patch(
+                `/api/v1/admin/rental/${rentalId}/approve`
+            );
+            return res;
+        } catch (error) {
+            console.error(
+                "approveRental error:",
+                error.response?.data || error
+            );
+            return null;
+        }
+    },
 
-  // PATCH /api/v1/admin/rental/:id/cancel
-  cancelRental(rentalId) {
-    return instance.patch(`${ADMIN_RENTAL_BASE}/${rentalId}/cancel`);
-  },
+    // PATCH /api/v1/admin/rental/:id/reject
+    async rejectRental(rentalId) {
+        try {
+            const res = await instance.patch(
+                `/api/v1/admin/rental/${rentalId}/reject`
+            );
+            return res;
+        } catch (error) {
+            console.error(
+                "rejectRental error:",
+                error.response?.data || error
+            );
+            return null;
+        }
+    },
+
+    // PATCH /api/v1/admin/rental/:id/cancel
+    async cancelRental(rentalId) {
+        try {
+            const res = await instance.patch(
+                `/api/v1/admin/rental/${rentalId}/cancel`
+            );
+            return res;
+        } catch (error) {
+            console.error(
+                "cancelRental error:",
+                error.response?.data || error
+            );
+            return null;
+        }
+    },
 };
 
 export default rentalAdminApi;
