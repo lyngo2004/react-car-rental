@@ -133,22 +133,50 @@
 
 // export default AdminCarList;
 
-import { Card, Button } from "antd";
+import { Card, Button, Input, Row, Col } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+
+const { Search } = Input;
 
 const AdminCarList = () => {
   const navigate = useNavigate();
 
   return (
     <Card
-      title="Cars Management"
-      extra={
-        <Button type="primary" onClick={() => navigate("/admin/cars/new")}>
-          Add New Car
-        </Button>
+      title={
+        <Row align="middle" justify="space-between">
+          {/* Left: Title */}
+          <Col>
+            <span style={{ fontSize: 18, fontWeight: 600 }}>
+              Cars Management
+            </span>
+          </Col>
+
+          {/* Center: Search */}
+          <Col flex="auto" style={{ padding: "10px 240px" }}>
+            <Search
+              placeholder="Search car by brand, model, license plate..."
+              allowClear
+              onSearch={(value) => {
+                // TODO: wire search logic when API is ready
+                console.log("search:", value);
+              }}
+            />
+          </Col>
+
+          {/* Right: Add button */}
+          <Col>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => navigate("/admin/cars/new")}
+            />
+          </Col>
+        </Row>
       }
     >
-      {/* TODO: AntD Table */}
+      {/* TODO: AntD Table (waiting for BE API) */}
       Car list will be displayed here.
     </Card>
   );

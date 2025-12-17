@@ -53,7 +53,19 @@ const AdminCarUpsert = ({ mode }) => {
         layout="vertical"
         onFinish={onFinish}
       >
-        <Row gutter={[24, 16]}>
+        <Row gutter={[24, 5]}>
+          {/* Car ID (Edit only) */}
+          {isEdit && (
+            <Col span={12}>
+              <Form.Item
+                label={<Text style={labelStyle}>Car ID</Text>}
+                name="carId"
+              >
+                <Input disabled />
+              </Form.Item>
+            </Col>
+          )}
+
           {/* Brand */}
           <Col span={12}>
             <Form.Item
@@ -62,6 +74,82 @@ const AdminCarUpsert = ({ mode }) => {
               rules={[{ required: true, message: "Brand is required" }]}
             >
               <Input placeholder="Brand" />
+            </Form.Item>
+          </Col>
+
+          {/* Model */}
+          <Col span={12}>
+            <Form.Item
+              label={<Text style={labelStyle}>Model</Text>}
+              name="model"
+              rules={[{ required: true, message: "Model is required" }]}
+            >
+              <Input placeholder="Model" />
+            </Form.Item>
+          </Col>
+
+          {/* Car Type */}
+          <Col span={12}>
+            <Form.Item
+              label={<Text style={labelStyle}>Car Type</Text>}
+              name="carType"
+              rules={[{ required: true, message: "Car type is required" }]}
+            >
+              <Select placeholder="Car Type">
+                <Option value="sedan">Sedan</Option>
+                <Option value="suv">SUV</Option>
+                <Option value="hatchback">Hatchback</Option>
+                <Option value="crossover">Crossover</Option>
+                <Option value="convertible">Convertible</Option>
+                <Option value="coupe">Coupe</Option>
+                <Option value="minivan">Minivan</Option>
+                <Option value="pickup">Pickup Truck</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+
+          {/* Manufacture Year */}
+          <Col span={12}>
+            <Form.Item
+              label={<Text style={labelStyle}>Manufacture Year</Text>}
+              name="manufactureYear"
+            >
+              <Input placeholder="e.g. 2021" />
+            </Form.Item>
+          </Col>
+
+          {/* Car Status */}
+          <Col span={12}>
+            <Form.Item
+              label={<Text style={labelStyle}>Car Status</Text>}
+              name="carStatus"
+            >
+              <Select placeholder="Status">
+                <Option value="available">Available</Option>
+                <Option value="rented">Rented</Option>
+                <Option value="maintenance">Maintenance</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+
+          {/* Price */}
+          <Col span={12}>
+            <Form.Item
+              label={<Text style={labelStyle}>Price Per Day</Text>}
+              name="pricePerDay"
+              rules={[{ required: true, message: "Price is required" }]}
+            >
+              <Input prefix="$" placeholder="Price" />
+            </Form.Item>
+          </Col>
+
+          {/* Mileage */}
+          <Col span={12}>
+            <Form.Item
+              label={<Text style={labelStyle}>Mileage</Text>}
+              name="mileage"
+            >
+              <Input placeholder="km" />
             </Form.Item>
           </Col>
 
@@ -75,37 +163,13 @@ const AdminCarUpsert = ({ mode }) => {
             </Form.Item>
           </Col>
 
-          {/* Model */}
+          {/* Color */}
           <Col span={12}>
             <Form.Item
-              label={<Text style={labelStyle}>Model</Text>}
-              name="model"
+              label={<Text style={labelStyle}>Color</Text>}
+              name="color"
             >
-              <Input placeholder="Model" />
-            </Form.Item>
-          </Col>
-
-          {/* Price */}
-          <Col span={12}>
-            <Form.Item
-              label={<Text style={labelStyle}>Price Per Day</Text>}
-              name="pricePerDay"
-            >
-              <Input prefix="$" placeholder="Price" />
-            </Form.Item>
-          </Col>
-
-          {/* Car Type */}
-          <Col span={12}>
-            <Form.Item
-              label={<Text style={labelStyle}>Car Type</Text>}
-              name="carType"
-            >
-              <Select placeholder="Car Type">
-                <Option value="sedan">Sedan</Option>
-                <Option value="suv">SUV</Option>
-                <Option value="hatchback">Hatchback</Option>
-              </Select>
+              <Input placeholder="Color" />
             </Form.Item>
           </Col>
 
@@ -114,35 +178,26 @@ const AdminCarUpsert = ({ mode }) => {
             <Form.Item
               label={<Text style={labelStyle}>License Plate</Text>}
               name="licensePlate"
+              rules={[{ required: true, message: "License plate is required" }]}
             >
               <Input placeholder="License Plate" />
             </Form.Item>
           </Col>
 
-          {/* Available Date */}
+          {/* Description */}
           <Col span={12}>
-            <Form.Item label={<Text style={labelStyle}>Available Date</Text>}>
-              <Input.Group compact>
-                <Form.Item name="availableDate" noStyle>
-                  <DatePicker style={{ width: "60%" }} />
-                </Form.Item>
-                <Form.Item name="availableTime" noStyle>
-                  <TimePicker style={{ width: "40%" }} />
-                </Form.Item>
-              </Input.Group>
+            <Form.Item
+              label={<Text style={labelStyle}>Description</Text>}
+              name="description"
+            >
+              <Input.TextArea rows={2} placeholder="Description" />
             </Form.Item>
           </Col>
-
-          {/* Empty col for balance */}
-          <Col span={12} />
 
           {/* Image Upload */}
           <Col span={24}>
             <Form.Item label={<Text style={labelStyle}>Car Image</Text>}>
-              <Upload.Dragger
-                multiple={false}
-                beforeUpload={() => false}
-              >
+              <Upload.Dragger multiple={false} beforeUpload={() => false}>
                 <p className="ant-upload-drag-icon">
                   <UploadOutlined />
                 </p>
@@ -153,7 +208,9 @@ const AdminCarUpsert = ({ mode }) => {
               </Upload.Dragger>
             </Form.Item>
           </Col>
+
         </Row>
+
 
         {/* Actions */}
         <div

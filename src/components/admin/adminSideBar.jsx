@@ -1,6 +1,7 @@
 import { Menu } from "antd";
 import {
   DashboardOutlined,
+  ShoppingCartOutlined,
   CarOutlined,
   UserOutlined,
   FileTextOutlined,
@@ -16,6 +17,7 @@ const AdminSideBar = () => {
 
   const items = [
     { key: "/admin/dashboard", icon: <DashboardOutlined />, label: "Dashboard" },
+    { key: "/admin/rentals", icon: <ShoppingCartOutlined />, label: "Rentals" },
     { key: "/admin/cars", icon: <CarOutlined />, label: "Cars" },
     { key: "/admin/customers", icon: <UserOutlined />, label: "Customers" },
     { key: "/admin/invoice", icon: <FileTextOutlined />, label: "Invoice" },
