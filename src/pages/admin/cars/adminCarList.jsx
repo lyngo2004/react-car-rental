@@ -1,171 +1,131 @@
-/**
-   * NOTE:
-   * The Admin Cars table implementation (AntD Table + data fetching) is intentionally commented out at this stage.
-   * 
-   * Reason:
-   * - The Admin Cars API endpoint is not implemented on the Backend yet.
-   * - Enabling the table logic now would cause runtime errors due to missing API responses.
-   *
-   * Current behavior:
-   * - This page only renders the layout shell (Card + "Add New Car" action).
-   * - No mock data or fake UI state is introduced.
-   *
-   * TODO (to be implemented after BE is ready):
-   * - Add admin car API (GET /api/v1/admin/cars).
-   * - Fetch data using the same axios + response pattern as customer pages.
-   * - Render AntD Table with real data from the backend.
-   */
-
-// import { Card, Table, Tag, Space, Input, Button, Image, Typography } from "antd";
-// import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
-// import { useEffect, useState } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { getAdminCars } from "../../../utils/admin/carApi";
-
-// const { Title } = Typography;
-// const { Search } = Input;
-
-// const AdminCarList = () => {
-//   const navigate = useNavigate();
-
-//   const [cars, setCars] = useState([]);
-//   const [loading, setLoading] = useState(false);
-
-//   useEffect(() => {
-//     fetchCars();
-//   }, []);
-
-//   const fetchCars = async () => {
-//     setLoading(true);
-//     const res = await getAdminCars();
-//     if (res?.EC === 0) {
-//       setCars(res.data || []);
-//     }
-//     setLoading(false);
-//   };
-
-//   const columns = [
-//     { title: "Car ID", dataIndex: "carId", key: "carId" },
-//     { title: "License Plate", dataIndex: "licensePlate", key: "licensePlate" },
-//     { title: "Brand", dataIndex: "brand", key: "brand" },
-//     { title: "Model", dataIndex: "model", key: "model" },
-//     { title: "Car Type", dataIndex: "carType", key: "carType" },
-//     { title: "Capacity", dataIndex: "capacity", key: "capacity" },
-//     {
-//       title: "Price Per Day",
-//       dataIndex: "pricePerDay",
-//       key: "pricePerDay",
-//       render: (v) => (v ? `$${v}` : "-"),
-//     },
-//     {
-//       title: "Car Status",
-//       dataIndex: "status",
-//       key: "status",
-//       render: (status) => {
-//         if (!status) return "-";
-//         let color = "default";
-//         if (status === "Available") color = "success";
-//         if (status === "Rented") color = "processing";
-//         if (status === "Maintenance") color = "warning";
-//         return <Tag color={color}>{status}</Tag>;
-//       },
-//     },
-//     {
-//       title: "Image",
-//       dataIndex: "imagePath",
-//       key: "imagePath",
-//       render: (src) =>
-//         src ? <Image src={src} width={70} /> : "-",
-//     },
-//     {
-//       title: "Actions",
-//       key: "actions",
-//       render: (_, record) => (
-//         <Space>
-//           <EditOutlined
-//             onClick={() => navigate(`/admin/cars/${record.carId}`)}
-//             style={{ cursor: "pointer" }}
-//           />
-//           <DeleteOutlined style={{ color: "#ff4d4f", cursor: "pointer" }} />
-//         </Space>
-//       ),
-//     },
-//   ];
-
-//   return (
-//     <Card style={{ borderRadius: 16 }}>
-//       {/* Header */}
-//       <div
-//         style={{
-//           display: "flex",
-//           justifyContent: "space-between",
-//           marginBottom: 16,
-//         }}
-//       >
-//         <Title level={4} style={{ margin: 0 }}>
-//           Admin Car Management Table
-//         </Title>
-
-//         <Space>
-//           <Search placeholder="Search" style={{ width: 220 }} />
-//           <Button
-//             type="primary"
-//             icon={<PlusOutlined />}
-//             onClick={() => navigate("/admin/cars/new")}
-//           >
-//             Add New Car
-//           </Button>
-//         </Space>
-//       </div>
-
-//       {/* Table */}
-//       <Table
-//         rowKey="carId"
-//         loading={loading}
-//         columns={columns}
-//         dataSource={cars}
-//         pagination={{ pageSize: 8 }}
-//         locale={{ emptyText: "No cars found" }}
-//       />
-//     </Card>
-//   );
-// };
-
-// export default AdminCarList;
-
-import { Card, Button, Input, Row, Col } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import {
+  Card,
+  Table,
+  Tag,
+  Space,
+  Input,
+  Button,
+  Image,
+  Row,
+  Col,
+  Typography,
+} from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import carAdminApi from "../../../utils/admin/carApi";
 
 const { Search } = Input;
+const { Text } = Typography;
 
-const AdminCarList = () => {
+const AdminCarListPage = () => {
   const navigate = useNavigate();
+
+  const [cars, setCars] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchCars();
+  }, []);
+
+  const fetchCars = async () => {
+    setLoading(true);
+    const res = await carAdminApi.getAllAdminCars();
+    if (res?.EC === 0) {
+      setCars(res.DT || []);
+    }
+    setLoading(false);
+  };
+
+  const columns = [
+    {
+      title: "Car ID",
+      dataIndex: "CarId",
+      key: "CarId",
+      width: 100,
+    },
+    {
+      title: "Image",
+      dataIndex: "ImagePath",
+      key: "ImagePath",
+      render: (src) =>
+        src ? <Image src={src} width={120} /> : "-",
+    },
+    {
+      title: "License Plate",
+      dataIndex: "LicensePlate",
+      key: "LicensePlate",
+    },
+    {
+      title: "Brand",
+      dataIndex: "Brand",
+      key: "Brand",
+    },
+    {
+      title: "Model",
+      dataIndex: "Model",
+      key: "Model",
+    },
+    {
+      title: "Car Type",
+      dataIndex: "CarType",
+      key: "CarType",
+    },
+    {
+      title: "Capacity",
+      dataIndex: "Capacity",
+      key: "Capacity",
+      align: "center",
+    },
+    {
+      title: "Price / Day",
+      dataIndex: "PricePerDay",
+      key: "PricePerDay",
+      render: (v) => <Text>${v}</Text>,
+    },
+    {
+      title: "Status",
+      dataIndex: "CarStatus",
+      key: "CarStatus",
+      render: (status) => {
+        let color = "default";
+        if (status === "Available") color = "green";
+        if (status === "Rented") color = "blue";
+        if (status === "Maintenance") color = "orange";
+
+        return <Tag color={color}>{status}</Tag>;
+      },
+    },
+  ];
 
   return (
     <Card
       title={
         <Row align="middle" justify="space-between">
-          {/* Left: Title */}
+          {/* Left */}
           <Col>
             <span style={{ fontSize: 18, fontWeight: 600 }}>
-              Cars Management
+              Cars
             </span>
           </Col>
 
-          {/* Center: Search */}
+          {/* Center */}
           <Col flex="auto" style={{ padding: "10px 240px" }}>
             <Search
               placeholder="Search car by brand, model, license plate..."
               allowClear
               onSearch={(value) => {
-                // TODO: wire search logic when API is ready
+                // TODO: implement search later
                 console.log("search:", value);
               }}
             />
           </Col>
 
-          {/* Right: Add button */}
+          {/* Right */}
           <Col>
             <Button
               type="primary"
@@ -176,10 +136,22 @@ const AdminCarList = () => {
         </Row>
       }
     >
-      {/* TODO: AntD Table (waiting for BE API) */}
-      Car list will be displayed here.
+      <Table
+        rowKey="CarId"
+        loading={loading}
+        columns={columns}
+        dataSource={cars}
+        pagination={{ pageSize: 8 }}
+        onRow={(record) => ({
+          onClick: () => {
+            navigate(`/admin/cars/${record.CarId}`);
+          },
+          style: { cursor: "pointer" },
+        })}
+        locale={{ emptyText: "No cars found" }}
+      />
     </Card>
   );
 };
 
-export default AdminCarList;
+export default AdminCarListPage;

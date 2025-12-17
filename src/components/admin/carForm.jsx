@@ -37,7 +37,7 @@ const CarForm = ({ mode, initialData, onSuccess }) => {
         <input defaultValue={initialData?.licensePlate || ""} />
       </div>
 
-      <div className="form-actions">
+      {/* <div className="form-actions">
         {mode === "edit" && (
           <button type="button" className="btn-danger" onClick={handleDelete}>
             Delete
@@ -47,7 +47,7 @@ const CarForm = ({ mode, initialData, onSuccess }) => {
         <button type="submit" className="btn-primary">
           Save
         </button>
-      </div>
+      </div> */}
     </form>
   );
 };
