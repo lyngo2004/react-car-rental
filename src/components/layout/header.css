@@ -1,0 +1,86 @@
+/* ================= HEADER ================= */
+.header {
+  width: 100%;
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+/* ================= LOGO ================= */
+.header-logo {
+  font-size: 28px;
+  font-weight: 700;
+  color: #3563e9;
+  letter-spacing: 1px;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ================= SEARCH ================= */
+.header-search-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 0 40px;
+}
+
+.header-search-box {
+  width: 60%;
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e3e3e3;
+  border-radius: 30px;
+  padding: 8px 16px;
+}
+
+.header-search-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  margin-left: 10px;
+  font-size: 16px;
+}
+
+/* ================= ICON GROUP ================= */
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.icon-box {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid #e8e8e8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  position: relative;
+}
+
+/* ================= BELL RED DOT ================= */
+.red-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: red;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+
+/* ================= AVATAR ================= */
+.header-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+}

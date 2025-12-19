@@ -82,7 +82,7 @@ const FilterSideBar = ({ onFilter, onFiltersChange, initialFilters }) => {
         const effectiveMax = isDefaultPrice ? undefined : max;
         const params = {};
         if (type && type.length > 0) params.type = type;
-        if (capacity && capacity.length > 0) params.capacity = capacity;
+        if (capacity) params.capacity = capacity;
         if (effectiveMin !== undefined && effectiveMin !== null) params.min = effectiveMin;
         if (effectiveMax !== undefined && effectiveMax !== null) params.max = effectiveMax;
 
