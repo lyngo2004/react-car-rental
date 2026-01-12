@@ -1,140 +1,101 @@
-import React from "react";
-import { Input } from "antd";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Dropdown, Menu } from "antd";
 import {
     SearchOutlined,
     SlidersOutlined,
     HeartOutlined,
     BellOutlined,
     SettingOutlined,
+    UserOutlined,
+    LogoutOutlined,
+    CarOutlined,
 } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import "./header.css";
 
-const Header = () => {
+const Header = ({ isAdmin = false }) => {
     const navigate = useNavigate();
 
-    return (
-        <div
-            style={{
-                width: "100%",
-                padding: "20px 40px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                background: "#FFFFFF",
-                borderBottom: "1px solid #f1f1f1",
-            }}
-        >
-            {/* ========================= LOGO ========================= */}
-            <div
-                onClick={() => navigate("/car")}
-                style={{
-                    fontSize: 28,
-                    fontWeight: 700,
-                    color: "#3563E9",
-                    letterSpacing: 1,
-                    cursor: "pointer",
-                    userSelect: "none",
-                }}
+    const handleLogout = () => {
+        localStorage.removeItem("accessToken");
+        navigate("/login");
+    };
+
+    const userMenu = (
+        <Menu>
+            <Menu.Item
+                key="profile"
+                icon={<UserOutlined />}
+                onClick={() => navigate("/profile")}
             >
+                Profile
+            </Menu.Item>
+
+            {!isAdmin && (
+                <Menu.Item
+                    key="rentals"
+                    icon={<CarOutlined />}
+                    onClick={() => navigate("/my-rentals")}
+                >
+                    My Rentals
+                </Menu.Item>
+            )}
+
+            <Menu.Divider />
+
+            <Menu.Item
+                key="logout"
+                icon={<LogoutOutlined />}
+                onClick={handleLogout}
+            >
+                Log out
+            </Menu.Item>
+        </Menu>
+    );
+
+    return (
+        <div className="header">
+            {/* LOGO */}
+            <div className="header-logo" onClick={() => navigate("/car")}>
                 MORENT
             </div>
 
-            {/* ======================= SEARCH BAR ======================= */}
-            <div
-                style={{
-                    flex: 1,
-                    display: "flex",
-                    justifyContent: "center",
-                    padding: "0 40px",
-                }}
-            >
-                <div
-                    style={{
-                        width: "60%",
-                        display: "flex",
-                        alignItems: "center",
-                        background: "#fff",
-                        border: "1px solid #E3E3E3",
-                        borderRadius: 30,
-                        padding: "8px 16px",
-                    }}
-                >
-                    <SearchOutlined style={{ fontSize: 18, color: "#555" }} />
-                    <input
-                        type="text"
-                        placeholder="Search something here"
-                        style={{
-                            flex: 1,
-                            border: "none",
-                            outline: "none",
-                            marginLeft: 10,
-                            fontSize: 16,
-                        }}
-                    />
-                    <SlidersOutlined style={{ fontSize: 20, color: "#555" }} />
+            {/* SEARCH */}
+            <div className="header-search-wrapper">
+                <div className="header-search-box">
+                    <SearchOutlined />
+                    <input placeholder="Search something here" />
+                    <SlidersOutlined />
                 </div>
             </div>
 
-            {/* ========================= ICONS ========================== */}
-            <div
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 16,
-                }}
-            >
-                {/* Heart icon */}
-                <div style={iconBoxStyle}>
+            {/* ICONS */}
+            <div className="header-icons">
+                <div className="icon-box">
                     <HeartOutlined />
                 </div>
 
-                {/* Bell with red dot */}
-                <div style={{ ...iconBoxStyle, position: "relative" }}>
+                <div className="icon-box">
                     <BellOutlined />
-                    <span
-                        style={{
-                            width: 10,
-                            height: 10,
-                            borderRadius: "50%",
-                            background: "red",
-                            position: "absolute",
-                            top: 6,
-                            right: 6,
-                        }}
-                    ></span>
+                    {/* {filteredNotifications.length > 0 && (
+                        <span className="red-dot" />
+                    )} */}
                 </div>
 
-                {/* Setting */}
-                <div style={iconBoxStyle}>
+                <div className="icon-box">
                     <SettingOutlined />
                 </div>
 
-                {/* Avatar */}
-                <img
-                    src="https://i.pravatar.cc/300"
-                    alt="avatar"
-                    style={{
-                        width: 42,
-                        height: 42,
-                        borderRadius: "50%",
-                        objectFit: "cover",
-                    }}
-                />
+                <Dropdown overlay={userMenu} placement="bottomRight" trigger={["click"]}>
+                    <img
+                        src="https://i.pravatar.cc/300"
+                        alt="avatar"
+                        className="header-avatar"
+                    />
+                </Dropdown>
             </div>
-        </div >
+        </div>
     );
-};
-
-const iconBoxStyle = {
-    width: 42,
-    height: 42,
-    borderRadius: "50%",
-    border: "1px solid #E8E8E8",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-    fontSize: 18,
 };
 
 export default Header;

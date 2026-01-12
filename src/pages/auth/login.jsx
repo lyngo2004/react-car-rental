@@ -2,7 +2,8 @@ import React from "react";
 import { Form, Input, Button, Checkbox, Typography, notification } from "antd";
 import { useNavigate } from "react-router-dom";
 import userApi from "../../utils/userApi";
-import "./auth.css"; // nhớ tạo file này
+import { isAdminFromToken } from '../../utils/authUtils';
+import "./auth.css";
 
 const { Title } = Typography;
 
@@ -21,7 +22,13 @@ const LoginPage = () => {
                 description: res.EM || "Login successfully!",
             });
 
-            navigate("/car");
+            // Redirect admin users to admin car list
+            const token = res.DT.accessToken;
+            if (isAdminFromToken(token)) {
+                navigate("/admin/cars");
+            } else {
+                navigate("/car");
+            }
         } else {
             notification.error({
                 message: "Login",
@@ -32,7 +39,9 @@ const LoginPage = () => {
 
     return (
         <div className="login-container">
-            <div className="login-left" />
+            <div className="login-left"
+                style={{ backgroundImage: "url(/carbg.jpg)" }}
+            />
 
             <div className="login-right">
                 <div className="login-header">

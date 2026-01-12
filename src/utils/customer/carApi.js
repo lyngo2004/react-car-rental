@@ -1,4 +1,4 @@
-import axios from "../utils/axios.customize";
+import axios from "../axios.customize";
 
 const carApi = {
     async getAllCars() {
